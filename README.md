@@ -152,7 +152,7 @@ screenshots/programa-calculadora-cargas.png
 Se o IntelliJ nao reconhecer o JavaFX automaticamente, use a configuracao de VM:
 
 ```text
---module-path lib/javafx-sdk-21.0.4/lib --add-modules javafx.controls
+--module-path lib/javafx-sdk-21.0.4/lib --add-modules javafx.controls,javafx.swing
 ```
 
 ## Como executar pelo Maven
