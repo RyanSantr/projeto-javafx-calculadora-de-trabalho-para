@@ -117,3 +117,4 @@ Define:
 | --- | --- |
 | `build.ps1` | Baixa JavaFX se necessario e compila o projeto. |
 | `run.ps1` | Compila e executa a aplicacao. |
+| `package.ps1` | Gera uma pasta executavel com `jpackage` e cria um ZIP para entrega. |

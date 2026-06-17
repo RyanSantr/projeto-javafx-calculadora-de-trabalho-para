@@ -16,6 +16,28 @@ Na raiz do projeto:
 
 Esse comando compila e abre a aplicacao.
 
+## Gerar executavel Windows
+
+Na raiz do projeto:
+
+```powershell
+.\package.ps1
+```
+
+O script usa `jpackage`, ferramenta incluida no JDK 21, para criar uma pasta executavel:
+
+```text
+dist/CalculadoraCargas/CalculadoraCargas.exe
+```
+
+Tambem e criado um ZIP para entrega:
+
+```text
+dist/CalculadoraCargas-windows.zip
+```
+
+Para distribuir o programa, envie o arquivo ZIP inteiro. A pessoa que receber deve extrair a pasta e abrir `CalculadoraCargas.exe`.
+
 ## Execucao pelo IntelliJ IDEA
 
 1. Abra a pasta do projeto no IntelliJ.

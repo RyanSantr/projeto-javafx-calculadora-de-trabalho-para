@@ -111,7 +111,7 @@ src/
 ## Requisitos
 
 - Java JDK 21
-- Windows PowerShell, para usar os scripts `build.ps1` e `run.ps1`
+- Windows PowerShell, para usar os scripts `build.ps1`, `run.ps1` e `package.ps1`
 - Opcional: IntelliJ IDEA
 - Opcional: Maven, se preferir executar pelo `pom.xml`
 
@@ -129,6 +129,32 @@ O script `run.ps1` chama `build.ps1`, que:
 2. baixa e extrai o SDK automaticamente se ele ainda nao existir;
 3. compila os arquivos Java em `out/classes`;
 4. executa a classe `Main`.
+
+## Como gerar o executavel
+
+No PowerShell:
+
+```powershell
+.\package.ps1
+```
+
+O script cria uma versao executavel em:
+
+```text
+dist/CalculadoraCargas/CalculadoraCargas.exe
+```
+
+Tambem cria um arquivo compactado para entrega:
+
+```text
+dist/CalculadoraCargas-windows.zip
+```
+
+Para abrir o programa sem IntelliJ, basta executar:
+
+```text
+dist/CalculadoraCargas/CalculadoraCargas.exe
+```
 
 ## Como executar pelo IntelliJ IDEA
 
