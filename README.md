@@ -86,12 +86,13 @@ W = -1,92 × 10^-13 J
 ```text
 src/
 ├── Main.java
-├── ScreenshotGenerator.java
 ├── model/
 │   └── PhysicsCalculator.java
 ├── view/
 │   ├── MainView.java
-│   └── ChargeSquarePane.java
+│   ├── ChargeSquarePane.java
+│   ├── ChargeSquare3DPane.java
+│   └── WorkGraphPane.java
 └── resources/
     └── style.css
 ```
@@ -106,12 +107,11 @@ src/
 | `ChargeSquarePane.java` | Desenha o quadrado, as linhas, as cargas e o rotulo do lado `a`. |
 | `ChargeSquare3DPane.java` | Exibe a animacao 3D do arranjo de cargas. |
 | `WorkGraphPane.java` | Exibe o grafico do trabalho em funcao da carga. |
-| `ScreenshotGenerator.java` | Gera automaticamente um print da interface com os valores do exemplo. |
 
 ## Requisitos
 
 - Java JDK 21
-- Windows PowerShell, para usar os scripts `build.ps1`, `run.ps1` e `screenshot.ps1`
+- Windows PowerShell, para usar os scripts `build.ps1` e `run.ps1`
 - Opcional: IntelliJ IDEA
 - Opcional: Maven, se preferir executar pelo `pom.xml`
 
@@ -130,18 +130,6 @@ O script `run.ps1` chama `build.ps1`, que:
 3. compila os arquivos Java em `out/classes`;
 4. executa a classe `Main`.
 
-## Como gerar o print
-
-```powershell
-.\screenshot.ps1
-```
-
-O arquivo sera salvo em:
-
-```text
-screenshots/programa-calculadora-cargas.png
-```
-
 ## Como executar pelo IntelliJ IDEA
 
 1. Abra esta pasta como projeto.
@@ -152,7 +140,7 @@ screenshots/programa-calculadora-cargas.png
 Se o IntelliJ nao reconhecer o JavaFX automaticamente, use a configuracao de VM:
 
 ```text
---module-path lib/javafx-sdk-21.0.4/lib --add-modules javafx.controls,javafx.swing
+--module-path lib/javafx-sdk-21.0.4/lib --add-modules javafx.controls
 ```
 
 ## Como executar pelo Maven

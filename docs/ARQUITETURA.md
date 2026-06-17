@@ -16,7 +16,6 @@ Essa organizacao facilita a leitura do codigo e evita misturar calculos fisicos 
 ```text
 src/
 ├── Main.java
-├── ScreenshotGenerator.java
 ├── model/
 │   └── PhysicsCalculator.java
 ├── view/
@@ -118,4 +117,3 @@ Define:
 | --- | --- |
 | `build.ps1` | Baixa JavaFX se necessario e compila o projeto. |
 | `run.ps1` | Compila e executa a aplicacao. |
-| `screenshot.ps1` | Compila, executa o gerador de screenshot e salva a imagem. |

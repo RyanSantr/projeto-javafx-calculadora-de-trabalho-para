@@ -16,18 +16,6 @@ Na raiz do projeto:
 
 Esse comando compila e abre a aplicacao.
 
-## Gerar screenshot
-
-```powershell
-.\screenshot.ps1
-```
-
-Saida:
-
-```text
-screenshots/programa-calculadora-cargas.png
-```
-
 ## Execucao pelo IntelliJ IDEA
 
 1. Abra a pasta do projeto no IntelliJ.
