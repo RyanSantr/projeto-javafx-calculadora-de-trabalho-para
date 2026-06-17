@@ -42,10 +42,22 @@ Conversoes usadas:
 A aplicacao possui tres regioes principais:
 
 - painel esquerdo: entrada de `q`, entrada de `a`, botao Calcular e botao Limpar;
-- painel central: representacao grafica do quadrado com cargas positivas em vermelho e negativas em azul;
+- painel central: abas com representacao 2D, animacao 3D e grafico `W x q`;
 - painel direito: formula, conversoes, substituicao dos valores e resultado final.
 
 ![Print da aplicacao](screenshots/programa-calculadora-cargas.png)
+
+### Visualizacao 3D
+
+O projeto tambem inclui uma animacao 3D das cargas nos vertices do quadrado:
+
+![Print da visualizacao 3D](screenshots/programa-calculadora-cargas-3d.png)
+
+### Grafico
+
+A aba de grafico mostra como o trabalho varia em funcao da carga `q`, mantendo o valor informado para o lado `a`:
+
+![Print do grafico](screenshots/programa-calculadora-cargas-grafico.png)
 
 ## Exemplo de calculo
 
@@ -92,6 +104,8 @@ src/
 | `MainView.java` | Monta a interface, valida entradas, chama o calculo e exibe o resultado. |
 | `PhysicsCalculator.java` | Realiza conversoes de unidades e calcula o trabalho eletrico. |
 | `ChargeSquarePane.java` | Desenha o quadrado, as linhas, as cargas e o rotulo do lado `a`. |
+| `ChargeSquare3DPane.java` | Exibe a animacao 3D do arranjo de cargas. |
+| `WorkGraphPane.java` | Exibe o grafico do trabalho em funcao da carga. |
 | `ScreenshotGenerator.java` | Gera automaticamente um print da interface com os valores do exemplo. |
 
 ## Requisitos

@@ -41,3 +41,10 @@ O arquivo abaixo registra a interface renderizada com os valores do exemplo:
 ```text
 screenshots/programa-calculadora-cargas.png
 ```
+
+O gerador de screenshots tambem cria imagens para as novas abas:
+
+```text
+screenshots/programa-calculadora-cargas-3d.png
+screenshots/programa-calculadora-cargas-grafico.png
+```

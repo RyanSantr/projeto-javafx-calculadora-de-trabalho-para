@@ -11,12 +11,15 @@ import view.MainView;
 
 public class ScreenshotGenerator extends Application {
 
+    private MainView mainView;
+    private Scene scene;
+
     @Override
     public void start(Stage stage) {
-        MainView mainView = new MainView();
+        mainView = new MainView();
         mainView.calculateWithValues("2,30", "64");
 
-        Scene scene = new Scene(mainView, 1180, 720);
+        scene = new Scene(mainView, 1180, 720);
         String css = getClass().getResource("/style.css").toExternalForm();
         scene.getStylesheets().add(css);
 
@@ -25,20 +28,35 @@ public class ScreenshotGenerator extends Application {
         stage.show();
 
         PauseTransition delay = new PauseTransition(Duration.millis(700));
-        delay.setOnFinished(event -> saveSnapshot(scene));
+        delay.setOnFinished(event -> saveAllSnapshots());
         delay.play();
     }
 
-    private void saveSnapshot(Scene scene) {
+    private void saveAllSnapshots() {
         try {
+            mainView.selectVisualTab(0);
+            saveSnapshot("screenshots/programa-calculadora-cargas.png");
+
+            mainView.selectVisualTab(1);
+            saveSnapshot("screenshots/programa-calculadora-cargas-3d.png");
+
+            mainView.selectVisualTab(2);
+            saveSnapshot("screenshots/programa-calculadora-cargas-grafico.png");
+        } finally {
+            System.exit(0);
+        }
+    }
+
+    private void saveSnapshot(String path) {
+        try {
+            mainView.applyCss();
+            mainView.layout();
             WritableImage image = scene.snapshot(null);
-            File output = new File("screenshots/programa-calculadora-cargas.png");
+            File output = new File(path);
             output.getParentFile().mkdirs();
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", output);
         } catch (Exception exception) {
             exception.printStackTrace();
-        } finally {
-            System.exit(0);
         }
     }
 

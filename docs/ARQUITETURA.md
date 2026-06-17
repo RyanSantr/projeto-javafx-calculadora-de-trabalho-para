@@ -21,7 +21,9 @@ src/
 │   └── PhysicsCalculator.java
 ├── view/
 │   ├── MainView.java
-│   └── ChargeSquarePane.java
+│   ├── ChargeSquarePane.java
+│   ├── ChargeSquare3DPane.java
+│   └── WorkGraphPane.java
 └── resources/
     └── style.css
 ```
@@ -45,7 +47,7 @@ Classe principal da interface grafica.
 Responsabilidades:
 
 - criar o painel esquerdo de entradas;
-- criar o painel central com o desenho do quadrado;
+- criar o painel central com abas de visualizacao;
 - criar o painel direito com os detalhes do calculo;
 - validar os campos digitados;
 - converter texto para `double`;
@@ -78,6 +80,24 @@ Componentes usados:
 - `Line` para os lados do quadrado;
 - `Circle` para representar as cargas;
 - `Text` para os simbolos `+q`, `-q` e o lado `a`.
+
+## ChargeSquare3DPane.java
+
+Classe responsavel pela visualizacao 3D animada.
+
+Componentes usados:
+
+- `SubScene` para renderizar conteudo 3D;
+- `Sphere` para representar cargas;
+- `Cylinder` para representar os lados do quadrado;
+- `PerspectiveCamera` para dar profundidade;
+- `RotateTransition` para manter o arranjo girando.
+
+## WorkGraphPane.java
+
+Classe responsavel pelo grafico `W x q`.
+
+O grafico usa `LineChart`, `NumberAxis` e uma serie de pontos calculados com a mesma classe `PhysicsCalculator`.
 
 ## style.css
 

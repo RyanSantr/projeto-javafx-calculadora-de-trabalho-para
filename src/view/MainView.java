@@ -7,6 +7,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -22,6 +24,8 @@ public class MainView extends BorderPane {
     private final TextField sideField = new TextField();
     private final Label resultLabel = new Label("Informe os valores e clique em Calcular.");
     private final Label errorLabel = new Label();
+    private final WorkGraphPane workGraphPane = new WorkGraphPane();
+    private final TabPane visualTabs = new TabPane();
 
     public MainView() {
         getStyleClass().add("root-pane");
@@ -107,12 +111,20 @@ public class MainView extends BorderPane {
         Label subtitle = new Label("+q e -q posicionadas nos vértices de um quadrado");
         subtitle.getStyleClass().add("muted-text");
 
-        ChargeSquarePane squarePane = new ChargeSquarePane();
+        visualTabs.getStyleClass().add("visual-tabs");
+        visualTabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        VBox panel = new VBox(18, title, subtitle, squarePane);
+        Tab diagram2dTab = new Tab("2D", new ChargeSquarePane());
+        Tab diagram3dTab = new Tab("3D animado", new ChargeSquare3DPane());
+        Tab graphTab = new Tab("Grafico W x q", workGraphPane);
+
+        visualTabs.getTabs().addAll(diagram2dTab, diagram3dTab, graphTab);
+
+        VBox panel = new VBox(18, title, subtitle, visualTabs);
         panel.getStyleClass().add("center-panel");
         panel.setAlignment(Pos.CENTER);
         BorderPane.setMargin(panel, new Insets(0, 24, 0, 24));
+        VBox.setVgrow(visualTabs, Priority.ALWAYS);
 
         return panel;
     }
@@ -147,6 +159,7 @@ public class MainView extends BorderPane {
             double work = calculator.calculateWork(qC, aM);
 
             resultLabel.setText(buildResultText(qPc, qC, aCm, aM, work));
+            workGraphPane.updateGraph(qPc, aCm);
         } catch (IllegalArgumentException exception) {
             errorLabel.setText(exception.getMessage());
             resultLabel.setText("Corrija os campos destacados para calcular o trabalho.");
@@ -157,6 +170,10 @@ public class MainView extends BorderPane {
         chargeField.setText(chargePc);
         sideField.setText(sideCm);
         calculate();
+    }
+
+    public void selectVisualTab(int index) {
+        visualTabs.getSelectionModel().select(index);
     }
 
     private double parsePositiveNumber(TextField field, String fieldName) {
@@ -235,6 +252,7 @@ public class MainView extends BorderPane {
         sideField.clear();
         clearValidationState();
         resultLabel.setText("Informe os valores e clique em Calcular.");
+        workGraphPane.clearGraph();
     }
 
     private void clearValidationState() {
