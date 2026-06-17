@@ -41,7 +41,10 @@ jpackage `
     --dest $dist
 
 $appFolder = Join-Path $dist "CalculadoraCargas"
+$runtimeBin = Join-Path $appFolder "runtime\bin"
 $zipPath = Join-Path $dist "CalculadoraCargas-windows.zip"
+
+Copy-Item -Path (Join-Path $root "lib\javafx-sdk-21.0.4\bin\*.dll") -Destination $runtimeBin -Force
 
 if (Test-Path $zipPath) {
     Remove-Item -LiteralPath $zipPath -Force
