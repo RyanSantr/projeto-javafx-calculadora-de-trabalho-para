@@ -46,15 +46,14 @@ A tela principal foi desenhada como um dashboard cientifico escuro:
 
 ## Visualizacao 3D
 
-A aba **Ondas 3D** usa apenas JavaFX nativo, sem bibliotecas externas. Ela inclui:
+A aba **Ondas 3D** usa um estilo 2.5D: parece tridimensional, mas e desenhada com formas 2D do JavaFX para ficar mais limpa e controlada. Ela inclui:
 
-- cargas em esferas 3D;
-- grade estilo CAD;
+- cargas desenhadas como esferas 2D com brilho e sombra;
+- grade isometrica estilo CAD;
 - ondas eletricas lineares percorrendo as ligacoes;
 - particulas animadas de fluxo em linha reta;
 - luzes coloridas;
-- rotacao automatica;
-- controle por mouse para girar e scroll para zoom.
+- perspectiva desenhada em ambiente pseudo-3D.
 
 ![Print da visualizacao 3D](screenshots/programa-calculadora-cargas-3d.png)
 
@@ -128,7 +127,7 @@ src/
 | `MainView.java` | Monta o dashboard, valida entradas, chama o calculo e atualiza os paineis. |
 | `PhysicsCalculator.java` | Faz conversoes, aplica a formula fisica e retorna o resultado completo. |
 | `ChargeSquarePane.java` | Desenha a representacao 2D com `Circle`, `Line` e `Text`. |
-| `ChargeSquare3DPane.java` | Renderiza a simulacao 3D com `SubScene`, esferas, luzes, particulas e camera. |
+| `ChargeSquare3DPane.java` | Renderiza a simulacao 2.5D isometrica com formas 2D, brilho e ondas lineares. |
 | `WorkGraphPane.java` | Gera o grafico `W x q` com `LineChart`. |
 | `ResultCard.java` | Organiza conversoes, formula, substituicao e resultado em cards. |
 | `HistoryPane.java` | Mostra e limpa o historico de simulacoes. |

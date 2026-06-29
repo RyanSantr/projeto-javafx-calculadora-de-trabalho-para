@@ -106,24 +106,23 @@ As cargas positivas aparecem em vermelho e as negativas em azul/ciano.
 
 ## ChargeSquare3DPane.java
 
-Renderiza a simulacao 3D usando JavaFX nativo:
+Renderiza uma simulacao 2.5D usando JavaFX nativo. A cena parece 3D, mas e desenhada com componentes 2D para manter o visual limpo.
 
-- `SubScene`;
-- `PerspectiveCamera`;
-- `Sphere`;
-- `Cylinder`;
-- `AmbientLight`;
-- `PointLight`;
-- `RotateTransition`;
+- `Pane`;
+- `Polygon`;
+- `Line`;
+- `Circle`;
+- `Ellipse`;
+- `Text`;
 - `AnimationTimer`.
 
 Elementos visuais:
 
-- quatro cargas nos vertices;
+- quatro cargas nos vertices em perspectiva isometrica;
 - ondas eletricas lineares;
 - particulas animadas em linha reta;
 - grade estilo CAD;
-- controle por mouse e zoom por scroll.
+- brilho, sombras e profundidade desenhada.
 
 ## WorkGraphPane.java
 

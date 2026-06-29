@@ -1,35 +1,41 @@
 package view;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
-import javafx.animation.RotateTransition;
-import javafx.geometry.Point3D;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.AmbientLight;
 import javafx.scene.Group;
-import javafx.scene.PerspectiveCamera;
-import javafx.scene.PointLight;
-import javafx.scene.SceneAntialiasing;
-import javafx.scene.SubScene;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Cylinder;
-import javafx.scene.shape.Sphere;
-import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Translate;
-import javafx.util.Duration;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 public class ChargeSquare3DPane extends StackPane {
 
     private static final double SIZE = 390;
+    private static final double CENTER_X = 195;
+    private static final double CENTER_Y = 218;
     private static final double HALF_SIDE = 108;
+
     private static final Color POSITIVE = Color.web("#ff365f");
     private static final Color NEGATIVE = Color.web("#2dd4ff");
     private static final Color WAVE = Color.web("#facc15");
+
+    private final List<WavePulse> waves = new ArrayList<>();
+    private final List<Circle> halos = new ArrayList<>();
 
     public ChargeSquare3DPane() {
         getStyleClass().add("visual-pane");
@@ -38,239 +44,233 @@ public class ChargeSquare3DPane extends StackPane {
         setMaxSize(SIZE, SIZE);
         setAlignment(Pos.CENTER);
 
-        getChildren().add(createScene());
-        getChildren().add(createLegend());
+        Pane scene = new Pane();
+        scene.setMinSize(SIZE, SIZE);
+        scene.setPrefSize(SIZE, SIZE);
+        scene.setMaxSize(SIZE, SIZE);
+        scene.getStyleClass().add("pseudo-3d-pane");
+
+        buildScene(scene);
+        getChildren().addAll(scene, createLegend());
+        startAnimation();
     }
 
-    private SubScene createScene() {
-        Point3D topLeft = new Point3D(-HALF_SIDE, 0, -HALF_SIDE);
-        Point3D topRight = new Point3D(HALF_SIDE, 0, -HALF_SIDE);
-        Point3D bottomLeft = new Point3D(-HALF_SIDE, 0, HALF_SIDE);
-        Point3D bottomRight = new Point3D(HALF_SIDE, 0, HALF_SIDE);
+    private void buildScene(Pane scene) {
+        IsoPoint topLeft = new IsoPoint(-HALF_SIDE, -HALF_SIDE);
+        IsoPoint topRight = new IsoPoint(HALF_SIDE, -HALF_SIDE);
+        IsoPoint bottomLeft = new IsoPoint(-HALF_SIDE, HALF_SIDE);
+        IsoPoint bottomRight = new IsoPoint(HALF_SIDE, HALF_SIDE);
+
+        scene.getChildren().addAll(platform(topLeft, topRight, bottomRight, bottomLeft));
+        scene.getChildren().add(grid());
 
         Group waveLayer = new Group();
-        List<LinearWave> waves = new ArrayList<>();
-        List<Sphere> halos = new ArrayList<>();
-
-        Group chargeSystem = new Group(
-                grid(),
-                squareEdge(topLeft, topRight),
-                squareEdge(topRight, bottomRight),
-                squareEdge(bottomLeft, bottomRight),
-                squareEdge(topLeft, bottomLeft),
-                interactionLine(topLeft, bottomRight, Color.web("#ff4d6d", 0.28)),
-                interactionLine(topRight, bottomLeft, Color.web("#2dd4ff", 0.28)),
-                waveLayer,
-                charge(topLeft, true, halos),
-                charge(topRight, false, halos),
-                charge(bottomLeft, false, halos),
-                charge(bottomRight, true, halos)
+        scene.getChildren().addAll(
+                connection(topLeft, topRight, Color.web("#2dd4ff", 0.85), 4.0),
+                connection(topRight, bottomRight, Color.web("#67e8f9", 0.70), 3.0),
+                connection(bottomLeft, bottomRight, Color.web("#2dd4ff", 0.85), 4.0),
+                connection(topLeft, bottomLeft, Color.web("#67e8f9", 0.70), 3.0),
+                connection(topLeft, bottomRight, Color.web("#ff4d6d", 0.30), 1.8),
+                connection(topRight, bottomLeft, Color.web("#2dd4ff", 0.28), 1.8),
+                waveLayer
         );
 
-        addLinearWaves(waveLayer, waves, topLeft, topRight, 0.00);
-        addLinearWaves(waveLayer, waves, topLeft, bottomLeft, 0.18);
-        addLinearWaves(waveLayer, waves, bottomRight, topRight, 0.36);
-        addLinearWaves(waveLayer, waves, bottomRight, bottomLeft, 0.54);
-        addLinearWaves(waveLayer, waves, topLeft, bottomRight, 0.72);
-        addLinearWaves(waveLayer, waves, bottomRight, topLeft, 0.90);
+        addWaveLine(waveLayer, topLeft, topRight, 0.00);
+        addWaveLine(waveLayer, topLeft, bottomLeft, 0.15);
+        addWaveLine(waveLayer, bottomRight, topRight, 0.30);
+        addWaveLine(waveLayer, bottomRight, bottomLeft, 0.45);
+        addWaveLine(waveLayer, topLeft, bottomRight, 0.60);
+        addWaveLine(waveLayer, topRight, bottomLeft, 0.78);
 
-        Group world = new Group(chargeSystem);
-        Rotate xRotate = new Rotate(-24, Rotate.X_AXIS);
-        Rotate yRotate = new Rotate(30, Rotate.Y_AXIS);
-        Rotate zRotate = new Rotate(6, Rotate.Z_AXIS);
-        world.getTransforms().addAll(xRotate, yRotate, zRotate);
+        List<Group> charges = List.of(
+                charge(topLeft, true),
+                charge(topRight, false),
+                charge(bottomLeft, false),
+                charge(bottomRight, true)
+        );
 
-        AmbientLight ambientLight = new AmbientLight(Color.color(0.45, 0.50, 0.58));
-        PointLight redLight = pointLight(Color.web("#ff4d6d"), -210, -210, -260);
-        PointLight blueLight = pointLight(Color.web("#2dd4ff"), 220, -160, 180);
-        PointLight whiteLight = pointLight(Color.WHITE, 0, -330, -430);
-
-        Group root = new Group(world, ambientLight, redLight, blueLight, whiteLight);
-
-        PerspectiveCamera camera = new PerspectiveCamera(true);
-        camera.setNearClip(0.1);
-        camera.setFarClip(2500);
-        camera.setTranslateZ(-760);
-
-        SubScene subScene = new SubScene(root, SIZE, SIZE, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#050816"));
-        subScene.setCamera(camera);
-        enableMouseControl(subScene, xRotate, yRotate, camera);
-
-        RotateTransition rotation = new RotateTransition(Duration.seconds(22), chargeSystem);
-        rotation.setAxis(Rotate.Y_AXIS);
-        rotation.setFromAngle(0);
-        rotation.setToAngle(360);
-        rotation.setCycleCount(Animation.INDEFINITE);
-        rotation.play();
-
-        startWaveAnimation(waves, halos);
-
-        return subScene;
+        charges.stream()
+                .sorted(Comparator.comparingDouble(group -> (double) group.getUserData()))
+                .forEach(scene.getChildren()::add);
     }
 
-    private Group charge(Point3D position, boolean positive, List<Sphere> halos) {
-        Color coreColor = positive ? POSITIVE : NEGATIVE;
-        Color haloColor = positive ? Color.web("#ff4d6d", 0.24) : Color.web("#2dd4ff", 0.24);
+    private Group platform(IsoPoint... points) {
+        Polygon top = new Polygon();
+        Polygon shadow = new Polygon();
 
-        Sphere halo = new Sphere(34);
-        halo.setMaterial(material(haloColor, Color.WHITE, 18));
+        for (IsoPoint point : points) {
+            Point2D projected = project(point);
+            top.getPoints().addAll(projected.getX(), projected.getY());
+            shadow.getPoints().addAll(projected.getX(), projected.getY() + 18);
+        }
 
-        Sphere core = new Sphere(22);
-        core.setMaterial(material(coreColor, Color.WHITE, 34));
+        shadow.setFill(Color.web("#020617", 0.70));
+        shadow.setEffect(new DropShadow(28, Color.web("#2dd4ff", 0.14)));
 
-        Sphere highlight = new Sphere(6);
-        highlight.setMaterial(material(Color.rgb(255, 255, 255, 0.72), Color.WHITE, 22));
-        highlight.getTransforms().add(new Translate(-8, -12, -13));
+        top.setFill(Color.web("#08111f", 0.72));
+        top.setStroke(Color.web("#2dd4ff", 0.28));
+        top.setStrokeWidth(1.4);
 
-        Group group = new Group(halo, core, highlight);
-        group.getTransforms().add(new Translate(position.getX(), position.getY(), position.getZ()));
-        halos.add(halo);
-        return group;
+        return new Group(shadow, top);
     }
 
     private Group grid() {
         Group group = new Group();
-        Color gridColor = Color.web("#67e8f9", 0.18);
+        Color gridColor = Color.web("#67e8f9", 0.22);
 
-        for (int offset = -160; offset <= 160; offset += 40) {
-            group.getChildren().add(edge(new Point3D(offset, 32, -160), new Point3D(offset, 32, 160), gridColor, 0.55));
-            group.getChildren().add(edge(new Point3D(-160, 32, offset), new Point3D(160, 32, offset), gridColor, 0.55));
+        for (double offset = -HALF_SIDE; offset <= HALF_SIDE; offset += 36) {
+            group.getChildren().add(connection(new IsoPoint(offset, -HALF_SIDE), new IsoPoint(offset, HALF_SIDE), gridColor, 0.75));
+            group.getChildren().add(connection(new IsoPoint(-HALF_SIDE, offset), new IsoPoint(HALF_SIDE, offset), gridColor, 0.75));
         }
 
         return group;
     }
 
-    private Cylinder squareEdge(Point3D start, Point3D end) {
-        return edge(start, end, Color.web("#2dd4ff", 0.86), 4.6);
+    private Line connection(IsoPoint start, IsoPoint end, Color color, double width) {
+        Point2D a = project(start);
+        Point2D b = project(end);
+
+        Line line = new Line(a.getX(), a.getY(), b.getX(), b.getY());
+        line.setStroke(color);
+        line.setStrokeWidth(width);
+        line.setEffect(new DropShadow(14, Color.web("#2dd4ff", 0.34)));
+        return line;
     }
 
-    private Cylinder interactionLine(Point3D start, Point3D end, Color color) {
-        return edge(start, end, color, 1.6);
+    private Group charge(IsoPoint base, boolean positive) {
+        Point2D ground = project(base);
+        double height = 34;
+        double x = ground.getX();
+        double y = ground.getY() - height;
+
+        Ellipse shadow = new Ellipse(x, ground.getY() + 7, 29, 8);
+        shadow.setFill(Color.web("#020617", 0.65));
+
+        Line stem = new Line(x, ground.getY(), x, y + 18);
+        stem.setStroke(Color.web("#e2e8f0", 0.32));
+        stem.setStrokeWidth(1.5);
+
+        Color color = positive ? POSITIVE : NEGATIVE;
+        Circle halo = new Circle(x, y, 31);
+        halo.setFill(Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.18));
+        halo.setEffect(new DropShadow(26, color));
+
+        Circle body = new Circle(x, y, 23);
+        body.setFill(radial(color));
+        body.setStroke(Color.WHITE);
+        body.setStrokeWidth(2);
+        body.setEffect(new DropShadow(18, color));
+
+        Circle shine = new Circle(x - 8, y - 9, 5);
+        shine.setFill(Color.web("#ffffff", 0.82));
+
+        Text label = new Text(positive ? "+q" : "-q");
+        label.setFill(Color.WHITE);
+        label.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
+        label.setX(x - 12);
+        label.setY(y + 6);
+
+        halos.add(halo);
+        Group group = new Group(shadow, stem, halo, body, shine, label);
+        group.setUserData(ground.getY());
+        return group;
     }
 
-    private void addLinearWaves(Group layer, List<LinearWave> waves, Point3D start, Point3D end, double phaseOffset) {
+    private RadialGradient radial(Color color) {
+        return new RadialGradient(
+                0,
+                0,
+                0.30,
+                0.25,
+                0.85,
+                true,
+                CycleMethod.NO_CYCLE,
+                new Stop(0, Color.WHITE),
+                new Stop(0.18, color.brighter()),
+                new Stop(1, color.darker())
+        );
+    }
+
+    private void addWaveLine(Group layer, IsoPoint start, IsoPoint end, double phaseOffset) {
+        Point2D a = project(start);
+        Point2D b = project(end);
+
         for (int i = 0; i < 4; i++) {
-            LinearWave wave = new LinearWave(start, end, phaseOffset + i * 0.22, 0.62 + i * 0.04);
-            waves.add(wave);
-            layer.getChildren().add(wave.node());
+            WavePulse pulse = new WavePulse(a, b, phaseOffset + i * 0.22, 0.46 + i * 0.04);
+            waves.add(pulse);
+            layer.getChildren().add(pulse.node());
         }
     }
 
-    private void startWaveAnimation(List<LinearWave> waves, List<Sphere> halos) {
+    private void startAnimation() {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 double seconds = now / 1_000_000_000.0;
 
-                for (LinearWave wave : waves) {
+                for (WavePulse wave : waves) {
                     wave.update(seconds);
                 }
 
                 for (int i = 0; i < halos.size(); i++) {
-                    double scale = 1.0 + Math.sin(seconds * 3.2 + i * 0.8) * 0.09;
-                    Sphere halo = halos.get(i);
+                    double scale = 1.0 + Math.sin(seconds * 3.1 + i * 0.8) * 0.09;
+                    Circle halo = halos.get(i);
                     halo.setScaleX(scale);
                     halo.setScaleY(scale);
-                    halo.setScaleZ(scale);
+                    halo.setOpacity(0.58 + Math.sin(seconds * 2.4 + i) * 0.12);
                 }
             }
         };
         timer.start();
     }
 
-    private Cylinder edge(Point3D start, Point3D end, Color color, double radius) {
-        Point3D direction = end.subtract(start);
-        Point3D midpoint = start.midpoint(end);
-
-        Cylinder cylinder = new Cylinder(radius, direction.magnitude());
-        cylinder.setMaterial(material(color, Color.WHITE, 24));
-        cylinder.getTransforms().add(new Translate(midpoint.getX(), midpoint.getY(), midpoint.getZ()));
-        cylinder.getTransforms().add(rotationToDirection(direction));
-        return cylinder;
-    }
-
-    private Rotate rotationToDirection(Point3D direction) {
-        Point3D yAxis = new Point3D(0, 1, 0);
-        Point3D normalized = direction.normalize();
-        Point3D rotationAxis = yAxis.crossProduct(normalized);
-
-        if (rotationAxis.magnitude() < 0.0001) {
-            return new Rotate(normalized.getY() < 0 ? 180 : 0, Rotate.X_AXIS);
-        }
-
-        double angle = Math.toDegrees(Math.acos(clamp(yAxis.dotProduct(normalized), -1, 1)));
-        return new Rotate(angle, rotationAxis);
-    }
-
-    private PhongMaterial material(Color diffuse, Color specular, double specularPower) {
-        PhongMaterial material = new PhongMaterial(diffuse);
-        material.setSpecularColor(specular);
-        material.setSpecularPower(specularPower);
-        return material;
-    }
-
-    private PointLight pointLight(Color color, double x, double y, double z) {
-        PointLight light = new PointLight(color);
-        light.getTransforms().add(new Translate(x, y, z));
-        return light;
-    }
-
-    private void enableMouseControl(SubScene scene, Rotate xRotate, Rotate yRotate, PerspectiveCamera camera) {
-        double[] anchor = new double[4];
-
-        scene.setOnMousePressed(event -> {
-            anchor[0] = event.getSceneX();
-            anchor[1] = event.getSceneY();
-            anchor[2] = xRotate.getAngle();
-            anchor[3] = yRotate.getAngle();
-        });
-
-        scene.setOnMouseDragged(event -> {
-            double deltaX = event.getSceneX() - anchor[0];
-            double deltaY = event.getSceneY() - anchor[1];
-            xRotate.setAngle(clamp(anchor[2] - deltaY * 0.35, -68, 35));
-            yRotate.setAngle(anchor[3] + deltaX * 0.35);
-        });
-
-        scene.setOnScroll(event -> camera.setTranslateZ(clamp(camera.getTranslateZ() + event.getDeltaY() * 0.45, -980, -460)));
-    }
-
-    private double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
+    private Point2D project(IsoPoint point) {
+        double x = CENTER_X + (point.x() - point.z()) * 0.78;
+        double y = CENTER_Y + (point.x() + point.z()) * 0.34;
+        return new Point2D(x, y);
     }
 
     private Label createLegend() {
-        Label legend = new Label("Ondas lineares: pulsos eletricos percorrem as ligacoes");
+        Label legend = new Label("2.5D isometrico: desenhado em 2D com ondas eletricas lineares");
         legend.getStyleClass().add("visual-caption");
         StackPane.setAlignment(legend, Pos.BOTTOM_CENTER);
         return legend;
     }
 
-    private class LinearWave {
+    private record IsoPoint(double x, double z) {
+    }
+
+    private static class WavePulse {
         private final Group node;
-        private final Point3D start;
-        private final Point3D end;
+        private final Point2D start;
+        private final Point2D end;
         private final double phase;
         private final double speed;
+        private final Line tail;
+        private final Circle glow;
+        private final Circle head;
 
-        LinearWave(Point3D start, Point3D end, double phase, double speed) {
+        WavePulse(Point2D start, Point2D end, double phase, double speed) {
             this.start = start;
             this.end = end;
             this.phase = phase;
             this.speed = speed;
 
-            Sphere head = new Sphere(5.5);
-            head.setMaterial(material(WAVE, Color.WHITE, 38));
+            tail = new Line();
+            tail.setStroke(Color.web("#facc15", 0.55));
+            tail.setStrokeWidth(2.2);
+            tail.setEffect(new DropShadow(14, WAVE));
 
-            Sphere halo = new Sphere(10);
-            halo.setMaterial(material(Color.web("#facc15", 0.18), Color.WHITE, 18));
+            glow = new Circle(8);
+            glow.setFill(Color.web("#facc15", 0.16));
 
-            Cylinder streak = new Cylinder(1.8, 30);
-            streak.setMaterial(material(Color.web("#facc15", 0.54), Color.WHITE, 30));
-            streak.getTransforms().add(rotationToDirection(end.subtract(start)));
+            head = new Circle(4.4);
+            head.setFill(WAVE);
+            head.setStroke(Color.WHITE);
+            head.setStrokeWidth(0.9);
+            head.setEffect(new DropShadow(16, WAVE));
 
-            node = new Group(halo, streak, head);
+            node = new Group(tail, glow, head);
         }
 
         Group node() {
@@ -279,16 +279,29 @@ public class ChargeSquare3DPane extends StackPane {
 
         void update(double seconds) {
             double progress = (seconds * speed + phase) % 1.0;
-            Point3D position = start.interpolate(end, progress);
+            double previous = Math.max(0, progress - 0.10);
+
+            Point2D current = start.interpolate(end, progress);
+            Point2D trail = start.interpolate(end, previous);
             double pulse = Math.sin(progress * Math.PI);
 
-            node.setTranslateX(position.getX());
-            node.setTranslateY(position.getY() - 6);
-            node.setTranslateZ(position.getZ());
-            node.setScaleX(0.75 + pulse * 0.38);
-            node.setScaleY(node.getScaleX());
-            node.setScaleZ(node.getScaleX());
-            node.setOpacity(0.30 + pulse * 0.70);
+            tail.setStartX(trail.getX());
+            tail.setStartY(trail.getY());
+            tail.setEndX(current.getX());
+            tail.setEndY(current.getY());
+            tail.setOpacity(0.22 + pulse * 0.70);
+
+            glow.setCenterX(current.getX());
+            glow.setCenterY(current.getY());
+            glow.setScaleX(0.85 + pulse * 0.65);
+            glow.setScaleY(glow.getScaleX());
+            glow.setOpacity(0.22 + pulse * 0.50);
+
+            head.setCenterX(current.getX());
+            head.setCenterY(current.getY());
+            head.setScaleX(0.82 + pulse * 0.36);
+            head.setScaleY(head.getScaleX());
+            head.setOpacity(0.36 + pulse * 0.64);
         }
     }
 }
