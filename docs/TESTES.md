@@ -33,6 +33,7 @@ W ≈ -1,92 × 10^-13 J
 - numero menor ou igual a zero;
 - decimal com virgula;
 - decimal com ponto.
+- atualizacao automatica do resultado ao alterar os campos.
 
 ## Resultado visual documentado
 
@@ -42,4 +43,12 @@ Os arquivos abaixo registram a interface do projeto com os valores do exemplo:
 screenshots/programa-calculadora-cargas.png
 screenshots/programa-calculadora-cargas-3d.png
 screenshots/programa-calculadora-cargas-grafico.png
+```
+
+## PDF explicativo
+
+A explicacao do calculo tambem esta registrada em:
+
+```text
+docs/calculo-cargas-eletricas.pdf
 ```

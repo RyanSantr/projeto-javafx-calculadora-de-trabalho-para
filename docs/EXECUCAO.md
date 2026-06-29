@@ -16,6 +16,8 @@ Na raiz do projeto:
 
 Esse comando compila e abre a aplicacao.
 
+Depois de aberta, a aplicacao atualiza o resultado automaticamente quando os dois campos possuem valores validos.
+
 ## Gerar executavel Windows
 
 Na raiz do projeto:

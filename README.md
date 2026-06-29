@@ -41,7 +41,7 @@ Conversoes usadas:
 
 A aplicacao possui tres regioes principais:
 
-- painel esquerdo: entrada de `q`, entrada de `a`, botao Calcular e botao Limpar;
+- painel esquerdo: entrada de `q`, entrada de `a`, calculo automatico, botao Calcular, botao Limpar e botao Exemplo;
 - painel central: abas com representacao 2D, animacao 3D e grafico `W x q`;
 - painel direito: formula, conversoes, substituicao dos valores e resultado final.
 
@@ -81,6 +81,20 @@ Resultado aproximado:
 W = -1,92 × 10^-13 J
 ```
 
+## PDF explicativo
+
+O projeto inclui um PDF com a explicacao passo a passo do calculo:
+
+```text
+docs/calculo-cargas-eletricas.pdf
+```
+
+O texto fonte tambem esta disponivel em:
+
+```text
+docs/CALCULO_EXPLICADO.md
+```
+
 ## Estrutura do projeto
 
 ```text
@@ -103,7 +117,7 @@ src/
 | --- | --- |
 | `Main.java` | Inicializa a aplicacao JavaFX, cria a cena e aplica o CSS. |
 | `MainView.java` | Monta a interface, valida entradas, chama o calculo e exibe o resultado. |
-| `PhysicsCalculator.java` | Realiza conversoes de unidades e calcula o trabalho eletrico. |
+| `PhysicsCalculator.java` | Centraliza as constantes, conversoes e o resultado completo do calculo. |
 | `ChargeSquarePane.java` | Desenha o quadrado, as linhas, as cargas e o rotulo do lado `a`. |
 | `ChargeSquare3DPane.java` | Exibe a animacao 3D do arranjo de cargas. |
 | `WorkGraphPane.java` | Exibe o grafico do trabalho em funcao da carga. |
@@ -184,6 +198,7 @@ mvn javafx:run
 - suporte a numeros decimais com virgula ou ponto;
 - mensagens de erro amigaveis;
 - resultado em notacao cientifica.
+- calculo automatico enquanto o usuario digita.
 
 ## Observacao sobre arquivos gerados
 

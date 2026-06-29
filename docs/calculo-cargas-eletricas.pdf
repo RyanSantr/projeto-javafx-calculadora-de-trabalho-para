@@ -1,0 +1,262 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 2037 >>
+stream
+BT
+/F1 18 Tf
+72 760 Td
+(Calculo do Trabalho para Montagem das Cargas) Tj
+-72 -760 Td
+/F1 14 Tf
+72 719 Td
+(1. Situacao fisica) Tj
+-72 -719 Td
+/F1 10 Tf
+72 682 Td
+(O sistema possui quatro cargas nos vertices de um quadrado:) Tj
+-72 -682 Td
+/F1 10 Tf
+72 658 Td
+(+q ------- -q) Tj
+-72 -658 Td
+/F1 10 Tf
+72 644 Td
+(|           |) Tj
+-72 -644 Td
+/F1 10 Tf
+72 630 Td
+(|           |) Tj
+-72 -630 Td
+/F1 10 Tf
+72 616 Td
+(-q ------- +q) Tj
+-72 -616 Td
+/F1 10 Tf
+72 592 Td
+(O objetivo e calcular o trabalho necessario para montar esse arranjo.) Tj
+-72 -592 Td
+/F1 10 Tf
+72 568 Td
+(Como o trabalho externo para montar cargas eletricas e igual a energia potencial) Tj
+-72 -568 Td
+/F1 10 Tf
+72 554 Td
+(eletrica total, temos:) Tj
+-72 -554 Td
+/F1 10 Tf
+72 530 Td
+(W = U) Tj
+-72 -530 Td
+/F1 14 Tf
+72 506 Td
+(2. Energia potencial entre duas cargas) Tj
+-72 -506 Td
+/F1 10 Tf
+72 469 Td
+(Para duas cargas puntiformes:) Tj
+-72 -469 Td
+/F1 10 Tf
+72 445 Td
+(U = k q1 q2 / r) Tj
+-72 -445 Td
+/F1 10 Tf
+72 421 Td
+(Onde:) Tj
+-72 -421 Td
+/F1 10 Tf
+72 397 Td
+(- `k = 8,99 x 10^9 N.m2/C2`;) Tj
+-72 -397 Td
+/F1 10 Tf
+72 383 Td
+(- `q1` e `q2` sao as cargas;) Tj
+-72 -383 Td
+/F1 10 Tf
+72 369 Td
+(- `r` e a distancia entre elas.) Tj
+-72 -369 Td
+/F1 14 Tf
+72 345 Td
+(3. Pares do quadrado) Tj
+-72 -345 Td
+/F1 10 Tf
+72 308 Td
+(Com quatro cargas, existem seis pares de interacao:) Tj
+-72 -308 Td
+/F1 10 Tf
+72 284 Td
+(- quatro pares nos lados do quadrado;) Tj
+-72 -284 Td
+/F1 10 Tf
+72 270 Td
+(- dois pares nas diagonais.) Tj
+-72 -270 Td
+/F1 10 Tf
+72 246 Td
+(Nos lados, as cargas tem sinais opostos. Por isso a energia e negativa:) Tj
+-72 -246 Td
+/F1 10 Tf
+72 222 Td
+(U_lados = 4\(-kq^2/a\)) Tj
+-72 -222 Td
+/F1 10 Tf
+72 198 Td
+(Nas diagonais, as cargas tem o mesmo sinal. Por isso a energia e positiva:) Tj
+-72 -198 Td
+/F1 10 Tf
+72 174 Td
+(U_diagonais = 2\(kq^2/\(a raiz\(2\)\)\)) Tj
+-72 -174 Td
+/F1 10 Tf
+72 150 Td
+(Somando:) Tj
+-72 -150 Td
+/F1 10 Tf
+72 126 Td
+(U = 4\(-kq^2/a\) + 2\(kq^2/\(a raiz\(2\)\)\)) Tj
+-72 -126 Td
+/F1 10 Tf
+72 102 Td
+(Simplificando:) Tj
+-72 -102 Td
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 1668 >>
+stream
+BT
+/F1 10 Tf
+72 760 Td
+(U = \(kq^2/a\)\(raiz\(2\) - 4\)) Tj
+-72 -760 Td
+/F1 10 Tf
+72 736 Td
+(Logo:) Tj
+-72 -736 Td
+/F1 10 Tf
+72 712 Td
+(W = \(kq^2/a\)\(raiz\(2\) - 4\)) Tj
+-72 -712 Td
+/F1 14 Tf
+72 688 Td
+(4. Conversoes de unidades) Tj
+-72 -688 Td
+/F1 10 Tf
+72 651 Td
+(O usuario informa:) Tj
+-72 -651 Td
+/F1 10 Tf
+72 627 Td
+(- carga em picoCoulombs \(`pC`\);) Tj
+-72 -627 Td
+/F1 10 Tf
+72 613 Td
+(- lado do quadrado em centimetros \(`cm`\).) Tj
+-72 -613 Td
+/F1 10 Tf
+72 589 Td
+(O programa converte tudo para o Sistema Internacional:) Tj
+-72 -589 Td
+/F1 10 Tf
+72 565 Td
+(q\(C\) = q\(pC\) x 10^-12) Tj
+-72 -565 Td
+/F1 10 Tf
+72 551 Td
+(a\(m\) = a\(cm\) x 10^-2) Tj
+-72 -551 Td
+/F1 14 Tf
+72 527 Td
+(5. Exemplo numerico) Tj
+-72 -527 Td
+/F1 10 Tf
+72 490 Td
+(Entrada:) Tj
+-72 -490 Td
+/F1 10 Tf
+72 466 Td
+(q = 2,30 pC) Tj
+-72 -466 Td
+/F1 10 Tf
+72 452 Td
+(a = 64 cm) Tj
+-72 -452 Td
+/F1 10 Tf
+72 428 Td
+(Conversoes:) Tj
+-72 -428 Td
+/F1 10 Tf
+72 404 Td
+(q = 2,30 x 10^-12 C) Tj
+-72 -404 Td
+/F1 10 Tf
+72 390 Td
+(a = 0,64 m) Tj
+-72 -390 Td
+/F1 10 Tf
+72 366 Td
+(Substituicao:) Tj
+-72 -366 Td
+/F1 10 Tf
+72 342 Td
+(W = \(\(8,99 x 10^9\)\(2,30 x 10^-12\)^2 / 0,64\)\(raiz\(2\) - 4\)) Tj
+-72 -342 Td
+/F1 10 Tf
+72 318 Td
+(Resultado:) Tj
+-72 -318 Td
+/F1 10 Tf
+72 294 Td
+(W aproximadamente -1,92 x 10^-13 J) Tj
+-72 -294 Td
+/F1 14 Tf
+72 270 Td
+(6. Interpretacao) Tj
+-72 -270 Td
+/F1 10 Tf
+72 233 Td
+(O resultado e negativo porque as quatro interacoes atrativas dos lados dominam as) Tj
+-72 -233 Td
+/F1 10 Tf
+72 219 Td
+(duas interacoes repulsivas das diagonais.) Tj
+-72 -219 Td
+/F1 10 Tf
+72 195 Td
+(Fisicamente, isso indica que o arranjo tem energia potencial total negativa.) Tj
+-72 -195 Td
+ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000197 00000 n 
+0000000323 00000 n 
+0000002412 00000 n 
+0000002538 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+4258
+%%EOF

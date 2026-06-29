@@ -52,6 +52,7 @@ Responsabilidades:
 - converter texto para `double`;
 - chamar `PhysicsCalculator`;
 - formatar o resultado em notacao cientifica.
+- atualizar resultado e grafico automaticamente enquanto o usuario digita.
 
 ## PhysicsCalculator.java
 
@@ -62,8 +63,17 @@ Metodos:
 ```java
 double picoToCoulomb(double q)
 double cmToMeter(double a)
+WorkResult calculateFromUserUnits(double chargePc, double sideCm)
 double calculateWork(double q, double a)
 ```
+
+O metodo `calculateFromUserUnits` recebe os valores digitados pelo usuario e devolve um `WorkResult` com:
+
+- carga original em `pC`;
+- lado original em `cm`;
+- carga convertida para Coulomb;
+- lado convertido para metro;
+- trabalho final em Joules.
 
 O metodo `calculateWork` espera valores ja convertidos para:
 

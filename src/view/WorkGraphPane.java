@@ -10,6 +10,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import model.PhysicsCalculator;
+import model.PhysicsCalculator.WorkResult;
 
 public class WorkGraphPane extends VBox {
 
@@ -40,22 +41,24 @@ public class WorkGraphPane extends VBox {
         VBox.setVgrow(chart, Priority.ALWAYS);
     }
 
-    public void updateGraph(double selectedChargePc, double sideCm) {
+    public void updateGraph(WorkResult result) {
         chart.getData().clear();
 
+        double selectedChargePc = result.chargePc();
+        double sideCm = result.sideCm();
         double maxChargePc = Math.max(5.0, selectedChargePc * 2.0);
-        double sideMeters = calculator.cmToMeter(sideCm);
 
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         for (int i = 0; i <= 40; i++) {
             double chargePc = maxChargePc * i / 40.0;
-            double chargeC = calculator.picoToCoulomb(chargePc);
-            double work = calculator.calculateWork(chargeC, sideMeters);
-            series.getData().add(new XYChart.Data<>(chargePc, work));
+            double workJoule = calculator.calculateFromUserUnits(chargePc, sideCm).workJoule();
+            series.getData().add(new XYChart.Data<>(chargePc, workJoule));
         }
 
         chart.getData().add(series);
-        caption.setText("Curva para a = " + formatDecimal(sideCm) + " cm. O trabalho fica mais negativo conforme q aumenta.");
+        caption.setText("Curva para a = " + formatDecimal(sideCm)
+                + " cm. Ponto atual: q = " + formatDecimal(selectedChargePc)
+                + " pC, W = " + formatScientific(result.workJoule()) + " J.");
     }
 
     public void clearGraph() {
@@ -68,6 +71,13 @@ public class WorkGraphPane extends VBox {
             return String.valueOf((long) value);
         }
         return String.format(java.util.Locale.forLanguageTag("pt-BR"), "%.2f", value);
+    }
+
+    private String formatScientific(double value) {
+        if (Math.abs(value) < 1E-30) {
+            return "0";
+        }
+        return new DecimalFormat("0.00E0").format(value).replace("E", " x10^");
     }
 
     private static class ScientificAxisFormatter extends StringConverter<Number> {

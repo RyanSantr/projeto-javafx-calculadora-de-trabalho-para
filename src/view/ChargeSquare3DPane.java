@@ -73,7 +73,7 @@ public class ChargeSquare3DPane extends StackPane {
         subScene.setFill(Color.web("#fbfcff"));
         subScene.setCamera(camera);
 
-        RotateTransition rotation = new RotateTransition(Duration.seconds(12), chargeSystem);
+        RotateTransition rotation = new RotateTransition(Duration.seconds(1), chargeSystem);
         rotation.setAxis(Rotate.Y_AXIS);
         rotation.setFromAngle(0);
         rotation.setToAngle(360);

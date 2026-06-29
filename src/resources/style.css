@@ -87,6 +87,17 @@
     -fx-text-fill: #c62828;
 }
 
+.status-label {
+    -fx-background-color: #eef8f3;
+    -fx-background-radius: 6px;
+    -fx-border-color: #cfeadd;
+    -fx-border-radius: 6px;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-padding: 8px 10px;
+    -fx-text-fill: #24734d;
+}
+
 .muted-text {
     -fx-font-size: 14px;
     -fx-text-fill: #64748b;
