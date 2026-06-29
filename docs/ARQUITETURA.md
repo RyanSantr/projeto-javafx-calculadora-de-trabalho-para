@@ -92,7 +92,7 @@ Componentes usados:
 
 ## ChargeSquare3DPane.java
 
-Classe responsavel pela visualizacao 3D animada.
+Classe responsavel pela visualizacao 3D interativa.
 
 Componentes usados:
 
@@ -100,7 +100,9 @@ Componentes usados:
 - `Sphere` para representar cargas;
 - `Cylinder` para representar os lados do quadrado;
 - `PerspectiveCamera` para dar profundidade;
-- `RotateTransition` para manter o arranjo girando.
+- `RotateTransition` e `AnimationTimer` para animacao;
+- eventos de mouse para rotacao manual e zoom;
+- particulas para indicar o fluxo entre cargas opostas.
 
 ## WorkGraphPane.java
 

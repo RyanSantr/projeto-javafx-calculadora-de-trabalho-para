@@ -42,14 +42,14 @@ Conversoes usadas:
 A aplicacao possui tres regioes principais:
 
 - painel esquerdo: entrada de `q`, entrada de `a`, calculo automatico, botao Calcular, botao Limpar e botao Exemplo;
-- painel central: abas com representacao 2D, animacao 3D e grafico `W x q`;
+- painel central: abas com representacao 2D, visualizacao 3D interativa e grafico `W x q`;
 - painel direito: formula, conversoes, substituicao dos valores e resultado final.
 
 ![Print da aplicacao](screenshots/programa-calculadora-cargas.png)
 
 ### Visualizacao 3D
 
-O projeto tambem inclui uma animacao 3D das cargas nos vertices do quadrado:
+O projeto tambem inclui uma visualizacao 3D interativa das cargas nos vertices do quadrado, com particulas de fluxo, diagonais de interacao, rotacao por mouse e zoom por scroll:
 
 ![Print da visualizacao 3D](screenshots/programa-calculadora-cargas-3d.png)
 
@@ -119,7 +119,7 @@ src/
 | `MainView.java` | Monta a interface, valida entradas, chama o calculo e exibe o resultado. |
 | `PhysicsCalculator.java` | Centraliza as constantes, conversoes e o resultado completo do calculo. |
 | `ChargeSquarePane.java` | Desenha o quadrado, as linhas, as cargas e o rotulo do lado `a`. |
-| `ChargeSquare3DPane.java` | Exibe a animacao 3D do arranjo de cargas. |
+| `ChargeSquare3DPane.java` | Exibe a visualizacao 3D interativa do arranjo de cargas. |
 | `WorkGraphPane.java` | Exibe o grafico do trabalho em funcao da carga. |
 
 ## Requisitos
