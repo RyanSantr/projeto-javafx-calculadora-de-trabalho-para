@@ -4,6 +4,7 @@
 
 - Java JDK 21 instalado;
 - PowerShell no Windows;
+- Bash no Linux, se for gerar o pacote Linux;
 - conexao com a internet na primeira execucao, caso o JavaFX SDK ainda nao esteja em `lib/`.
 
 ## Execucao recomendada
@@ -47,6 +48,25 @@ dist/CalculadoraCargas-windows.zip
 Para distribuir o programa, envie o arquivo ZIP inteiro. A pessoa que receber deve extrair a pasta e abrir `Abrir CalculadoraCargas.cmd` ou `CalculadoraCargas.exe`.
 
 Se o WiX Toolset estiver instalado no Windows, o script tambem tenta gerar um instalador `.exe` com atalho no menu iniciar e na area de trabalho.
+
+## Gerar app Linux
+
+Em um Linux com JDK 21:
+
+```bash
+bash package-linux.sh
+```
+
+O script baixa o JavaFX SDK para Linux, compila o projeto e cria:
+
+```text
+dist-linux/CalculadoraCargas/Abrir CalculadoraCargas.sh
+dist-linux/CalculadoraCargas-linux.tar.gz
+```
+
+Para distribuir no Linux, envie o arquivo `.tar.gz`. A pessoa deve extrair a pasta e abrir `Abrir CalculadoraCargas.sh`.
+
+O pacote Linux deve ser gerado em Linux, porque `jpackage` nao faz cross-build confiavel entre Windows e Linux.
 
 ## Execucao pelo IntelliJ IDEA
 

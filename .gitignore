@@ -5,3 +5,6 @@ target/
 out/
 lib/
 dist/
+dist-linux/
+lib-linux/
+out-linux/

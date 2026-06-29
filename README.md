@@ -126,6 +126,7 @@ src/
 
 - Java JDK 21
 - Windows PowerShell, para usar os scripts `build.ps1`, `run.ps1` e `package.ps1`
+- Linux com Bash, para usar `package-linux.sh`
 - Opcional: IntelliJ IDEA
 - Opcional: Maven, se preferir executar pelo `pom.xml`
 
@@ -177,6 +178,29 @@ Abrir CalculadoraCargas.cmd
 ```
 
 Tambem e possivel abrir diretamente `CalculadoraCargas.exe`.
+
+## Como gerar o app Linux
+
+Em um Linux com JDK 21:
+
+```bash
+bash package-linux.sh
+```
+
+O script cria:
+
+```text
+dist-linux/CalculadoraCargas/Abrir CalculadoraCargas.sh
+dist-linux/CalculadoraCargas-linux.tar.gz
+```
+
+Para usar, extraia o `.tar.gz` e clique em `Abrir CalculadoraCargas.sh`, ou execute pelo terminal:
+
+```bash
+./Abrir\ CalculadoraCargas.sh
+```
+
+Observacao: o pacote Linux precisa ser gerado em Linux. O Windows nao consegue criar um app Linux nativo com `jpackage`.
 
 ## Como executar pelo IntelliJ IDEA
 
