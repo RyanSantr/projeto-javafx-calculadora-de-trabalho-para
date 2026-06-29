@@ -9,40 +9,62 @@ q = 2,30 pC
 a = 64 cm
 ```
 
+Conversoes:
+
+```text
+q = 2,30 x 10^-12 C
+a = 0,64 m
+```
+
 Saida esperada:
 
 ```text
-W ≈ -1,92 × 10^-13 J
+W ~= -1,92 x 10^-13 J
 ```
 
-## Validacao feita
-
-O calculo foi conferido com:
+## Validacao do calculo
 
 ```text
-q = 2,30 × 10^-12 C
-a = 0,64 m
-W = ((8,99 × 10^9)(2,30 × 10^-12)² / 0,64)(√2 - 4)
-W ≈ -1,92 × 10^-13 J
+W = ((8,99 x 10^9)(2,30 x 10^-12)^2 / 0,64)(sqrt(2) - 4)
+W ~= -1,92 x 10^-13 J
 ```
 
-## Casos de entrada tratados
+O valor aparece negativo porque a soma das interacoes atrativas e repulsivas resulta em energia potencial total menor que zero.
+
+## Casos tratados pela interface
 
 - campo vazio;
 - texto que nao e numero;
 - numero menor ou igual a zero;
 - decimal com virgula;
-- decimal com ponto.
-- atualizacao automatica do resultado ao alterar os campos.
+- decimal com ponto;
+- atualizacao automatica do resultado;
+- limpeza dos campos;
+- historico de calculos manuais;
+- grafico atualizado pelo mesmo calculo fisico.
 
-## Resultado visual documentado
+## Validacao visual
 
-Os arquivos abaixo registram a interface do projeto com os valores do exemplo:
+Foram atualizados os prints da interface com os valores do exemplo:
 
 ```text
 screenshots/programa-calculadora-cargas.png
 screenshots/programa-calculadora-cargas-3d.png
 screenshots/programa-calculadora-cargas-grafico.png
+```
+
+## Validacao tecnica
+
+Comando executado no Windows:
+
+```powershell
+.\build.ps1
+```
+
+Resultado:
+
+```text
+Build concluido em out/classes
 ```
 
 ## PDF explicativo

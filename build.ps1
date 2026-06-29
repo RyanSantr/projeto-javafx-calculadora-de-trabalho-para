@@ -23,7 +23,7 @@ $jars = Get-ChildItem -Path $javaFxLib -Filter *.jar | ForEach-Object { $_.FullN
 $classpath = [string]::Join(";", $jars)
 $sources = Get-ChildItem -Path (Join-Path $root "src") -Recurse -Filter *.java | ForEach-Object { $_.FullName }
 
-javac -cp $classpath -d $classes $sources
+javac -encoding UTF-8 -cp $classpath -d $classes $sources
 Copy-Item -Path (Join-Path $root "src\resources\style.css") -Destination (Join-Path $classes "style.css") -Force
 
 Write-Host "Build concluído em $classes"

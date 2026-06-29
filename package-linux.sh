@@ -42,7 +42,7 @@ mkdir -p "$CLASSES" "$PACKAGE_INPUT" "$DIST"
 
 mapfile -d '' SOURCES < <(find "$ROOT/src" -name "*.java" -print0)
 
-javac -cp "$JAVAFX_LIB/*" -d "$CLASSES" "${SOURCES[@]}"
+javac -encoding UTF-8 -cp "$JAVAFX_LIB/*" -d "$CLASSES" "${SOURCES[@]}"
 cp "$ROOT/src/resources/style.css" "$CLASSES/style.css"
 
 jar --create --file "$JAR_PATH" --main-class Main -C "$CLASSES" .

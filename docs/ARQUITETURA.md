@@ -2,126 +2,179 @@
 
 ## Visao geral
 
-O projeto segue uma separacao simples entre:
+O projeto separa a regra fisica da interface grafica. Isso deixa o codigo mais facil de explicar, testar e manter.
 
-- inicializacao da aplicacao;
-- camada de interface;
-- camada de calculo;
-- recursos visuais.
+Camadas principais:
 
-Essa organizacao facilita a leitura do codigo e evita misturar calculos fisicos diretamente com componentes JavaFX.
+- `Main.java`: inicializacao do JavaFX;
+- `model/`: calculo fisico;
+- `view/`: componentes visuais;
+- `resources/`: CSS do tema.
 
 ## Estrutura
 
 ```text
 src/
-├── Main.java
-├── model/
-│   └── PhysicsCalculator.java
-├── view/
-│   ├── MainView.java
-│   ├── ChargeSquarePane.java
-│   ├── ChargeSquare3DPane.java
-│   └── WorkGraphPane.java
-└── resources/
-    └── style.css
+|-- Main.java
+|-- model/
+|   `-- PhysicsCalculator.java
+|-- view/
+|   |-- MainView.java
+|   |-- ChargeSquarePane.java
+|   |-- ChargeSquare3DPane.java
+|   |-- WorkGraphPane.java
+|   |-- ResultCard.java
+|   |-- HistoryPane.java
+|   |-- Theme.java
+|   `-- Animations.java
+`-- resources/
+    `-- style.css
+```
+
+## Fluxo de execucao
+
+```text
+Usuario digita q e a
+        |
+        v
+MainView valida entrada
+        |
+        v
+PhysicsCalculator converte unidades e calcula W
+        |
+        v
+MainView atualiza resultado, grafico, 2D/3D e historico
 ```
 
 ## Main.java
 
-Classe de entrada da aplicacao.
+Responsavel por:
 
-Responsabilidades:
-
-- estender `Application`;
+- iniciar a aplicacao JavaFX;
 - criar a `Scene`;
-- aplicar o arquivo `style.css`;
-- configurar titulo e tamanho minimo da janela;
+- aplicar `style.css`;
+- definir titulo, tamanho inicial e tamanho minimo;
 - exibir o `Stage`.
-
-## MainView.java
-
-Classe principal da interface grafica.
-
-Responsabilidades:
-
-- criar o painel esquerdo de entradas;
-- criar o painel central com abas de visualizacao;
-- criar o painel direito com os detalhes do calculo;
-- validar os campos digitados;
-- converter texto para `double`;
-- chamar `PhysicsCalculator`;
-- formatar o resultado em notacao cientifica.
-- atualizar resultado e grafico automaticamente enquanto o usuario digita.
 
 ## PhysicsCalculator.java
 
-Classe responsavel pela regra de calculo.
+Responsavel pela parte fisica.
 
-Metodos:
+Metodos principais:
 
 ```java
 double picoToCoulomb(double q)
 double cmToMeter(double a)
-WorkResult calculateFromUserUnits(double chargePc, double sideCm)
 double calculateWork(double q, double a)
+WorkResult calculateFromUserUnits(double chargePc, double sideCm)
 ```
 
-O metodo `calculateFromUserUnits` recebe os valores digitados pelo usuario e devolve um `WorkResult` com:
+`calculateWork` recebe valores ja convertidos:
 
-- carga original em `pC`;
-- lado original em `cm`;
-- carga convertida para Coulomb;
-- lado convertido para metro;
-- trabalho final em Joules.
+- carga em Coulomb;
+- distancia em metro.
 
-O metodo `calculateWork` espera valores ja convertidos para:
+`calculateFromUserUnits` recebe os valores digitados pelo usuario:
 
-- Coulomb (`C`);
-- metro (`m`).
+- `q` em pC;
+- `a` em cm;
+- e retorna tambem os valores convertidos.
+
+## MainView.java
+
+Responsavel pelo dashboard principal:
+
+- painel de entradas;
+- botoes `Calcular`, `Limpar` e `Exemplo`;
+- abas de visualizacao;
+- painel de resultado;
+- historico;
+- validacao;
+- formatacao de notacao cientifica.
+
+Essa classe coordena os componentes, mas nao faz a fisica diretamente. O calculo fica no `PhysicsCalculator`.
 
 ## ChargeSquarePane.java
 
-Classe responsavel apenas pelo desenho do sistema de cargas.
+Desenha a representacao 2D:
 
-Componentes usados:
+- `Line` para os lados;
+- `Circle` para cargas;
+- `Text` para `+q`, `-q` e `a`.
 
-- `Line` para os lados do quadrado;
-- `Circle` para representar as cargas;
-- `Text` para os simbolos `+q`, `-q` e o lado `a`.
+As cargas positivas aparecem em vermelho e as negativas em azul/ciano.
 
 ## ChargeSquare3DPane.java
 
-Classe responsavel pela visualizacao 3D interativa.
+Renderiza a simulacao 3D usando JavaFX nativo:
 
-Componentes usados:
+- `SubScene`;
+- `PerspectiveCamera`;
+- `Sphere`;
+- `Cylinder`;
+- `AmbientLight`;
+- `PointLight`;
+- `RotateTransition`;
+- `AnimationTimer`.
 
-- `SubScene` para renderizar conteudo 3D;
-- `Sphere` para representar cargas;
-- `Cylinder` para representar os lados do quadrado;
-- `PerspectiveCamera` para dar profundidade;
-- `RotateTransition` e `AnimationTimer` para animacao;
-- eventos de mouse para rotacao manual e zoom;
-- particulas para indicar o fluxo entre cargas opostas.
+Elementos visuais:
+
+- quatro cargas nos vertices;
+- arcos de interacao;
+- particulas animadas;
+- grade estilo CAD;
+- nucleo energetico central;
+- campo de estrelas;
+- controle por mouse e zoom por scroll.
 
 ## WorkGraphPane.java
 
-Classe responsavel pelo grafico `W x q`.
+Mostra o grafico `W x q`.
 
-O grafico usa `LineChart`, `NumberAxis` e uma serie de pontos calculados com a mesma classe `PhysicsCalculator`.
+O grafico calcula varios pontos usando a mesma regra do `PhysicsCalculator`, o que evita duplicar formula em outro lugar do projeto.
+
+## ResultCard.java
+
+Organiza a explicacao do resultado em cards:
+
+- conversoes;
+- formula;
+- substituicao dos valores;
+- resultado final em destaque.
+
+## HistoryPane.java
+
+Mantem uma lista visual dos calculos feitos manualmente. Cada item mostra:
+
+- horario;
+- carga `q`;
+- lado `a`;
+- trabalho `W`.
+
+## Theme.java
+
+Centraliza cores usadas no codigo Java quando a cor precisa ser aplicada diretamente no componente.
+
+## Animations.java
+
+Centraliza animacoes simples:
+
+- entrada com fade;
+- entrada com deslocamento;
+- efeito de hover nos botoes.
 
 ## style.css
 
-Arquivo CSS usado para manter a interface moderna e separar estilo de logica.
+Define o tema visual:
 
-Define:
-
-- cores dos paineis;
-- botoes;
-- campos de texto;
-- mensagens de erro;
-- estilo do quadrado;
-- estilo das cargas.
+- fundo escuro;
+- paineis estilo vidro;
+- botoes com gradiente;
+- campos com brilho ao focar;
+- cards de resultado;
+- tabs;
+- grafico;
+- historico.
 
 ## Scripts
 
@@ -129,5 +182,5 @@ Define:
 | --- | --- |
 | `build.ps1` | Baixa JavaFX se necessario e compila o projeto. |
 | `run.ps1` | Compila e executa a aplicacao. |
-| `package.ps1` | Gera uma pasta executavel com `jpackage` e cria um ZIP para entrega. |
-| `package-linux.sh` | Gera uma pasta executavel Linux e cria um `.tar.gz` para entrega. |
+| `package.ps1` | Gera executavel Windows com `jpackage` e cria ZIP. |
+| `package-linux.sh` | Gera pacote Linux e cria `.tar.gz`. |

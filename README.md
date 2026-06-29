@@ -1,16 +1,16 @@
-# Calculadora de Trabalho para Montagem de Cargas Eletricas
+# Electric Field Simulator
 
-Aplicacao desktop desenvolvida em **Java 21 + JavaFX** para calcular o trabalho necessario para montar um sistema de quatro cargas eletricas posicionadas nos vertices de um quadrado.
+Aplicacao desktop em **Java 21 + JavaFX** para calcular o trabalho necessario para montar quatro cargas eletricas nos vertices de um quadrado.
 
-Este projeto foi organizado como trabalho universitario, com separacao entre interface, desenho grafico e calculo fisico.
+O projeto foi feito para trabalho universitario, com calculo fisico separado da interface, visual 2D, simulacao 3D interativa, grafico e pacote executavel para Windows e Linux.
 
 ## Objetivo
 
-Permitir que o usuario informe:
+O usuario informa:
 
-- valor da carga `q` em picoCoulombs (`pC`);
+- carga `q` em picoCoulombs (`pC`);
 - lado do quadrado `a` em centimetros (`cm`);
-- e receba o trabalho `W`, em Joules (`J`), usando a energia potencial eletrica total do arranjo.
+- e recebe o trabalho `W` em Joules (`J`).
 
 ## Formula
 
@@ -19,43 +19,49 @@ O trabalho necessario para montar o sistema e igual a energia potencial eletrica
 ```text
 W = U
 
-U = 4(-kq²/a) + 2(kq²/(a√2))
+U = 4(-kq^2/a) + 2(kq^2/(a sqrt(2)))
 
-U = (kq²/a)(√2 - 4)
+U = (kq^2/a)(sqrt(2) - 4)
 ```
 
 Onde:
 
 ```text
-k = 8,99 × 10^9 N·m²/C²
-```
-
-Conversoes usadas:
-
-```text
+k = 8,99 x 10^9 N.m^2/C^2
 1 pC = 10^-12 C
 1 cm = 10^-2 m
 ```
 
-## Interface
+## Interface premium
 
-A aplicacao possui tres regioes principais:
+A tela principal foi desenhada como um dashboard cientifico escuro:
 
-- painel esquerdo: entrada de `q`, entrada de `a`, calculo automatico, botao Calcular, botao Limpar e botao Exemplo;
-- painel central: abas com representacao 2D, visualizacao 3D interativa e grafico `W x q`;
-- painel direito: formula, conversoes, substituicao dos valores e resultado final.
+- painel esquerdo com entradas, botoes e resumo do modelo fisico;
+- painel central com abas para cena 2D, nucleo 3D e grafico `W x q`;
+- painel direito com conversoes, formula, substituicao e resultado final;
+- historico inferior com os calculos feitos na sessao;
+- tema futurista com cards, brilho, neon azul, vermelho para `+q` e ciano/azul para `-q`.
 
 ![Print da aplicacao](screenshots/programa-calculadora-cargas.png)
 
-### Visualizacao 3D
+## Visualizacao 3D
 
-O projeto tambem inclui uma visualizacao 3D interativa das cargas nos vertices do quadrado, com particulas de fluxo, diagonais de interacao, rotacao por mouse e zoom por scroll:
+A aba **Nucleo 3D** usa apenas JavaFX nativo, sem bibliotecas externas. Ela inclui:
+
+- cargas em esferas 3D;
+- grade estilo CAD;
+- arcos de interacao entre cargas;
+- particulas animadas de fluxo;
+- nucleo energetico central;
+- luzes coloridas;
+- rotacao automatica;
+- controle por mouse para girar e scroll para zoom.
 
 ![Print da visualizacao 3D](screenshots/programa-calculadora-cargas-3d.png)
 
-### Grafico
+## Grafico
 
-A aba de grafico mostra como o trabalho varia em funcao da carga `q`, mantendo o valor informado para o lado `a`:
+A aba de grafico mostra a variacao do trabalho em funcao da carga `q`, mantendo o valor atual de `a`.
 
 ![Print do grafico](screenshots/programa-calculadora-cargas-grafico.png)
 
@@ -71,25 +77,25 @@ a = 64 cm
 Conversoes:
 
 ```text
-q = 2,30 × 10^-12 C
+q = 2,30 x 10^-12 C
 a = 0,64 m
 ```
 
 Resultado aproximado:
 
 ```text
-W = -1,92 × 10^-13 J
+W = -1,92 x 10^-13 J
 ```
 
 ## PDF explicativo
 
-O projeto inclui um PDF com a explicacao passo a passo do calculo:
+O projeto inclui um PDF com a explicacao passo a passo do problema:
 
 ```text
 docs/calculo-cargas-eletricas.pdf
 ```
 
-O texto fonte tambem esta disponivel em:
+O texto fonte tambem esta em:
 
 ```text
 docs/CALCULO_EXPLICADO.md
@@ -99,38 +105,46 @@ docs/CALCULO_EXPLICADO.md
 
 ```text
 src/
-├── Main.java
-├── model/
-│   └── PhysicsCalculator.java
-├── view/
-│   ├── MainView.java
-│   ├── ChargeSquarePane.java
-│   ├── ChargeSquare3DPane.java
-│   └── WorkGraphPane.java
-└── resources/
-    └── style.css
+|-- Main.java
+|-- model/
+|   `-- PhysicsCalculator.java
+|-- view/
+|   |-- MainView.java
+|   |-- ChargeSquarePane.java
+|   |-- ChargeSquare3DPane.java
+|   |-- WorkGraphPane.java
+|   |-- ResultCard.java
+|   |-- HistoryPane.java
+|   |-- Theme.java
+|   `-- Animations.java
+`-- resources/
+    `-- style.css
 ```
 
 ## Classes principais
 
 | Classe | Responsabilidade |
 | --- | --- |
-| `Main.java` | Inicializa a aplicacao JavaFX, cria a cena e aplica o CSS. |
-| `MainView.java` | Monta a interface, valida entradas, chama o calculo e exibe o resultado. |
-| `PhysicsCalculator.java` | Centraliza as constantes, conversoes e o resultado completo do calculo. |
-| `ChargeSquarePane.java` | Desenha o quadrado, as linhas, as cargas e o rotulo do lado `a`. |
-| `ChargeSquare3DPane.java` | Exibe a visualizacao 3D interativa do arranjo de cargas. |
-| `WorkGraphPane.java` | Exibe o grafico do trabalho em funcao da carga. |
+| `Main.java` | Inicializa o JavaFX, cria a janela, aplica o CSS e define tamanho minimo. |
+| `MainView.java` | Monta o dashboard, valida entradas, chama o calculo e atualiza os paineis. |
+| `PhysicsCalculator.java` | Faz conversoes, aplica a formula fisica e retorna o resultado completo. |
+| `ChargeSquarePane.java` | Desenha a representacao 2D com `Circle`, `Line` e `Text`. |
+| `ChargeSquare3DPane.java` | Renderiza a simulacao 3D com `SubScene`, esferas, luzes, particulas e camera. |
+| `WorkGraphPane.java` | Gera o grafico `W x q` com `LineChart`. |
+| `ResultCard.java` | Organiza conversoes, formula, substituicao e resultado em cards. |
+| `HistoryPane.java` | Mostra e limpa o historico de simulacoes. |
+| `Theme.java` | Centraliza constantes de cor usadas no codigo Java. |
+| `Animations.java` | Centraliza animacoes simples de entrada e hover. |
 
 ## Requisitos
 
 - Java JDK 21
-- Windows PowerShell, para usar os scripts `build.ps1`, `run.ps1` e `package.ps1`
-- Linux com Bash, para usar `package-linux.sh`
+- Windows PowerShell para `build.ps1`, `run.ps1` e `package.ps1`
+- Linux com Bash para `package-linux.sh`
 - Opcional: IntelliJ IDEA
-- Opcional: Maven, se preferir executar pelo `pom.xml`
+- Opcional: Maven
 
-## Como executar
+## Como executar no Windows
 
 No PowerShell:
 
@@ -138,46 +152,23 @@ No PowerShell:
 .\run.ps1
 ```
 
-O script `run.ps1` chama `build.ps1`, que:
+O script compila e executa a classe `Main`. Se o JavaFX SDK 21.0.4 nao existir em `lib/`, o build tenta baixa-lo automaticamente.
 
-1. verifica se o JavaFX SDK 21.0.4 existe em `lib/`;
-2. baixa e extrai o SDK automaticamente se ele ainda nao existir;
-3. compila os arquivos Java em `out/classes`;
-4. executa a classe `Main`.
-
-## Como gerar o executavel
-
-No PowerShell:
+## Como gerar o executavel Windows
 
 ```powershell
 .\package.ps1
 ```
 
-O script cria uma versao executavel em:
+O pacote gerado fica em:
 
 ```text
 dist/CalculadoraCargas/CalculadoraCargas.exe
-```
-
-Tambem cria um atalho simples de duplo clique:
-
-```text
 dist/CalculadoraCargas/Abrir CalculadoraCargas.cmd
-```
-
-Tambem cria um arquivo compactado para entrega:
-
-```text
 dist/CalculadoraCargas-windows.zip
 ```
 
-Para abrir o programa sem IntelliJ, extraia o ZIP e clique em:
-
-```text
-Abrir CalculadoraCargas.cmd
-```
-
-Tambem e possivel abrir diretamente `CalculadoraCargas.exe`.
+Para entregar, use o ZIP. Depois de extrair, basta clicar em `CalculadoraCargas.exe` ou `Abrir CalculadoraCargas.cmd`.
 
 ## Como gerar o app Linux
 
@@ -187,51 +178,47 @@ Em um Linux com JDK 21:
 bash package-linux.sh
 ```
 
-O script cria:
+O script gera:
 
 ```text
 dist-linux/CalculadoraCargas/Abrir CalculadoraCargas.sh
 dist-linux/CalculadoraCargas-linux.tar.gz
 ```
 
-Para usar, extraia o `.tar.gz` e clique em `Abrir CalculadoraCargas.sh`, ou execute pelo terminal:
-
-```bash
-./Abrir\ CalculadoraCargas.sh
-```
-
-Observacao: o pacote Linux precisa ser gerado em Linux. O Windows nao consegue criar um app Linux nativo com `jpackage`.
+Observacao: o pacote Linux precisa ser gerado em Linux. O Windows nao cria app Linux nativo com `jpackage`.
 
 ## Como executar pelo IntelliJ IDEA
 
 1. Abra esta pasta como projeto.
 2. Configure o SDK do projeto como Java 21.
-3. Se usar Maven, aguarde a importacao das dependencias do `pom.xml`.
+3. Se usar Maven, aguarde a importacao do `pom.xml`.
 4. Execute a classe `Main`.
 
-Se o IntelliJ nao reconhecer o JavaFX automaticamente, use a configuracao de VM:
+Se o IntelliJ nao reconhecer o JavaFX automaticamente, use:
 
 ```text
 --module-path lib/javafx-sdk-21.0.4/lib --add-modules javafx.controls
 ```
 
-## Como executar pelo Maven
-
-Se o Maven estiver instalado:
-
-```bash
-mvn javafx:run
-```
-
 ## Validacoes implementadas
 
 - campos obrigatorios;
-- impedimento de valores menores ou iguais a zero;
-- suporte a numeros decimais com virgula ou ponto;
+- bloqueio de valores menores ou iguais a zero;
+- suporte a decimal com virgula ou ponto;
 - mensagens de erro amigaveis;
-- resultado em notacao cientifica.
-- calculo automatico enquanto o usuario digita.
+- resultado em notacao cientifica;
+- calculo automatico enquanto o usuario digita;
+- historico de calculos manuais;
+- interface responsiva para janela desktop.
 
-## Observacao sobre arquivos gerados
+## Arquivos gerados
 
-As pastas `lib/`, `out/` e `target/` nao devem ser versionadas. Elas sao geradas localmente durante a execucao ou compilacao.
+As pastas abaixo sao geradas localmente e nao devem ser versionadas:
+
+```text
+lib/
+out/
+target/
+dist/
+dist-linux/
+```

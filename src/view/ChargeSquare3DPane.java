@@ -5,6 +5,7 @@ import java.util.List;
 import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
 import javafx.animation.RotateTransition;
+import javafx.scene.Node;
 import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
 import javafx.scene.AmbientLight;
@@ -17,7 +18,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
@@ -28,6 +28,8 @@ public class ChargeSquare3DPane extends StackPane {
 
     private static final double SIZE = 390;
     private static final double HALF_SIDE = 102;
+    private static final Color POSITIVE = Color.web("#ff365f");
+    private static final Color NEGATIVE = Color.web("#2dd4ff");
 
     public ChargeSquare3DPane() {
         getStyleClass().add("visual-pane");
@@ -49,22 +51,35 @@ public class ChargeSquare3DPane extends StackPane {
         Group chargeSystem = new Group();
         Group flowLayer = new Group();
         List<FlowParticle> flowParticles = new ArrayList<>();
+        List<Node> pulseNodes = new ArrayList<>();
+
+        Group positiveA = charge(topLeft, true, pulseNodes);
+        Group negativeA = charge(topRight, false, pulseNodes);
+        Group negativeB = charge(bottomLeft, false, pulseNodes);
+        Group positiveB = charge(bottomRight, true, pulseNodes);
 
         chargeSystem.getChildren().addAll(
-                referencePlane(),
+                starField(),
                 grid(),
-                edge(topLeft, topRight, Color.web("#243247"), 4.2),
-                edge(topRight, bottomRight, Color.web("#243247"), 4.2),
-                edge(bottomLeft, bottomRight, Color.web("#243247"), 4.2),
-                edge(topLeft, bottomLeft, Color.web("#243247"), 4.2),
-                edge(topLeft, bottomRight, Color.web("#ef4444", 0.42), 2.2),
-                edge(topRight, bottomLeft, Color.web("#2563eb", 0.42), 2.2),
-                orbitRing(142, Color.web("#16a34a", 0.34), -18),
-                orbitRing(176, Color.web("#7c3aed", 0.26), 24),
-                charge(topLeft, true),
-                charge(topRight, false),
-                charge(bottomLeft, false),
-                charge(bottomRight, true),
+                energyCore(pulseNodes),
+                edge(topLeft, topRight, Color.web("#2dd4ff", 0.88), 4.8),
+                edge(topRight, bottomRight, Color.web("#67e8f9", 0.70), 3.4),
+                edge(bottomLeft, bottomRight, Color.web("#2dd4ff", 0.88), 4.8),
+                edge(topLeft, bottomLeft, Color.web("#67e8f9", 0.70), 3.4),
+                edge(topLeft, bottomRight, Color.web("#ff4d6d", 0.42), 2.0),
+                edge(topRight, bottomLeft, Color.web("#2dd4ff", 0.34), 2.0),
+                fieldArc(topLeft, topRight, -1, Color.web("#ffd166", 0.72)),
+                fieldArc(topLeft, bottomLeft, 1, Color.web("#ffd166", 0.72)),
+                fieldArc(bottomRight, topRight, 1, Color.web("#f97316", 0.60)),
+                fieldArc(bottomRight, bottomLeft, -1, Color.web("#f97316", 0.60)),
+                fieldArc(topLeft, bottomRight, 1, Color.web("#ff4d6d", 0.44)),
+                fieldArc(topRight, bottomLeft, -1, Color.web("#2dd4ff", 0.44)),
+                orbitRing(142, Color.web("#22c55e", 0.34), -18),
+                orbitRing(176, Color.web("#a855f7", 0.30), 24),
+                positiveA,
+                negativeA,
+                negativeB,
+                positiveB,
                 flowLayer
         );
 
@@ -74,17 +89,18 @@ public class ChargeSquare3DPane extends StackPane {
         addFlow(flowLayer, flowParticles, bottomRight, bottomLeft, 0.75);
 
         Group world = new Group(chargeSystem);
-        Rotate xRotate = new Rotate(-20, Rotate.X_AXIS);
-        Rotate yRotate = new Rotate(28, Rotate.Y_AXIS);
-        Rotate zRotate = new Rotate(8, Rotate.Z_AXIS);
+        Rotate xRotate = new Rotate(-48, Rotate.X_AXIS);
+        Rotate yRotate = new Rotate(24, Rotate.Y_AXIS);
+        Rotate zRotate = new Rotate(4, Rotate.Z_AXIS);
         world.getTransforms().addAll(xRotate, yRotate, zRotate);
 
         AmbientLight ambientLight = new AmbientLight(Color.color(0.50, 0.54, 0.63));
-        PointLight redLight = pointLight(Color.web("#ff6b6b"), -210, -210, -260);
-        PointLight blueLight = pointLight(Color.web("#5b8cff"), 220, -160, 180);
+        PointLight redLight = pointLight(Color.web("#ff4d6d"), -210, -210, -260);
+        PointLight blueLight = pointLight(Color.web("#2dd4ff"), 220, -160, 180);
+        PointLight greenLight = pointLight(Color.web("#22c55e"), 0, -120, 120);
         PointLight whiteLight = pointLight(Color.WHITE, 0, -320, -420);
 
-        Group root = new Group(world, ambientLight, redLight, blueLight, whiteLight);
+        Group root = new Group(world, ambientLight, redLight, blueLight, greenLight, whiteLight);
 
         PerspectiveCamera camera = new PerspectiveCamera(true);
         camera.setNearClip(0.1);
@@ -92,11 +108,11 @@ public class ChargeSquare3DPane extends StackPane {
         camera.setTranslateZ(-780);
 
         SubScene subScene = new SubScene(root, SIZE, SIZE, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#f7faff"));
+        subScene.setFill(Color.web("#050816"));
         subScene.setCamera(camera);
         enableMouseControl(subScene, xRotate, yRotate, camera);
 
-        RotateTransition rotation = new RotateTransition(Duration.seconds(10), chargeSystem);
+        RotateTransition rotation = new RotateTransition(Duration.seconds(18), chargeSystem);
         rotation.setAxis(Rotate.Y_AXIS);
         rotation.setFromAngle(0);
         rotation.setToAngle(360);
@@ -111,13 +127,14 @@ public class ChargeSquare3DPane extends StackPane {
         orbitRotation.play();
 
         startFlowAnimation(flowParticles);
+        startPulseAnimation(pulseNodes);
 
         return subScene;
     }
 
-    private Group charge(Point3D position, boolean positive) {
-        Color coreColor = positive ? Color.web("#ef2f2f") : Color.web("#1464e8");
-        Color haloColor = positive ? Color.web("#ff8a80", 0.24) : Color.web("#72a8ff", 0.24);
+    private Group charge(Point3D position, boolean positive, List<Node> pulseNodes) {
+        Color coreColor = positive ? POSITIVE : NEGATIVE;
+        Color haloColor = positive ? Color.web("#ff4d6d", 0.22) : Color.web("#2dd4ff", 0.22);
 
         Sphere halo = new Sphere(34);
         halo.setMaterial(material(haloColor, Color.WHITE));
@@ -131,26 +148,84 @@ public class ChargeSquare3DPane extends StackPane {
 
         Group group = new Group(halo, core, highlight);
         group.getTransforms().add(new Translate(position.getX(), position.getY(), position.getZ()));
+        pulseNodes.add(halo);
         return group;
-    }
-
-    private Box referencePlane() {
-        Box plane = new Box(310, 1.2, 310);
-        plane.setMaterial(material(Color.web("#dbeafe", 0.30), Color.web("#ffffff", 0.20)));
-        plane.getTransforms().add(new Translate(0, 28, 0));
-        return plane;
     }
 
     private Group grid() {
         Group group = new Group();
-        Color gridColor = Color.web("#93a4bd", 0.34);
+        Color gridColor = Color.web("#67e8f9", 0.28);
 
-        for (int offset = -150; offset <= 150; offset += 50) {
+        for (int offset = -160; offset <= 160; offset += 32) {
             group.getChildren().add(edge(new Point3D(offset, 24, -150), new Point3D(offset, 24, 150), gridColor, 0.8));
             group.getChildren().add(edge(new Point3D(-150, 24, offset), new Point3D(150, 24, offset), gridColor, 0.8));
         }
 
         return group;
+    }
+
+    private Group starField() {
+        Group group = new Group();
+        for (int i = 0; i < 80; i++) {
+            double x = ((i * 73) % 360) - 180;
+            double y = -190 - ((i * 31) % 160);
+            double z = ((i * 47) % 420) - 210;
+            double radius = i % 9 == 0 ? 1.8 : 1.0;
+
+            Sphere star = new Sphere(radius);
+            Color color = i % 4 == 0 ? Color.web("#67e8f9", 0.95) : Color.web("#ffffff", 0.78);
+            star.setMaterial(material(color, Color.WHITE));
+            star.getTransforms().add(new Translate(x, y, z));
+            group.getChildren().add(star);
+        }
+        return group;
+    }
+
+    private Group energyCore(List<Node> pulseNodes) {
+        Group core = new Group();
+
+        Cylinder beam = new Cylinder(3.0, 132);
+        beam.setMaterial(material(Color.web("#2dd4ff", 0.46), Color.WHITE));
+        beam.getTransforms().add(new Translate(0, -18, 0));
+
+        Sphere nucleus = new Sphere(13);
+        nucleus.setMaterial(material(Color.web("#22c55e", 0.72), Color.WHITE));
+        nucleus.getTransforms().add(new Translate(0, -18, 0));
+
+        Sphere corona = new Sphere(26);
+        corona.setMaterial(material(Color.web("#2dd4ff", 0.14), Color.WHITE));
+        corona.getTransforms().add(new Translate(0, -18, 0));
+
+        core.getChildren().addAll(beam, corona, nucleus);
+        pulseNodes.add(corona);
+        pulseNodes.add(nucleus);
+        return core;
+    }
+
+    private Group fieldArc(Point3D start, Point3D end, int direction, Color color) {
+        Group arc = new Group();
+        int segments = 18;
+        Point3D previous = null;
+
+        Point3D chord = end.subtract(start).normalize();
+        Point3D side = new Point3D(-chord.getZ(), 0, chord.getX()).multiply(direction);
+
+        for (int i = 0; i <= segments; i++) {
+            double t = (double) i / segments;
+            Point3D base = start.interpolate(end, t);
+            double wave = Math.sin(t * Math.PI);
+            Point3D current = base
+                    .add(side.multiply(wave * 34))
+                    .add(0, -36 * wave, 0);
+
+            if (previous != null) {
+                arc.getChildren().add(edge(previous, current, color, 0.82));
+            }
+
+            previous = current;
+        }
+
+        return arc;
     }
 
     private Group orbitRing(double radius, Color color, double y) {
@@ -197,6 +272,23 @@ public class ChargeSquare3DPane extends StackPane {
                 double seconds = now / 1_000_000_000.0;
                 for (FlowParticle particle : particles) {
                     particle.update(seconds);
+                }
+            }
+        };
+        timer.start();
+    }
+
+    private void startPulseAnimation(List<Node> nodes) {
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                double seconds = now / 1_000_000_000.0;
+                for (int i = 0; i < nodes.size(); i++) {
+                    Node node = nodes.get(i);
+                    double scale = 1.0 + Math.sin(seconds * 2.7 + i * 0.65) * 0.10;
+                    node.setScaleX(scale);
+                    node.setScaleY(scale);
+                    node.setScaleZ(scale);
                 }
             }
         };
@@ -260,7 +352,7 @@ public class ChargeSquare3DPane extends StackPane {
     }
 
     private Label createLegend() {
-        Label legend = new Label("3D interativo: arraste para girar | scroll para zoom | particulas mostram o fluxo");
+        Label legend = new Label("Arraste para girar | scroll para zoom | arcos = interacoes");
         legend.getStyleClass().add("visual-caption");
         StackPane.setAlignment(legend, Pos.BOTTOM_CENTER);
         return legend;

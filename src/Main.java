@@ -8,14 +8,14 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         MainView mainView = new MainView();
-        Scene scene = new Scene(mainView, 1180, 720);
+        Scene scene = new Scene(mainView, 1440, 900);
 
         String css = getClass().getResource("/style.css").toExternalForm();
         scene.getStylesheets().add(css);
 
-        stage.setTitle("Calculadora de Trabalho - Cargas Elétricas");
-        stage.setMinWidth(1020);
-        stage.setMinHeight(640);
+        stage.setTitle("Electric Field Simulator - JavaFX");
+        stage.setMinWidth(1180);
+        stage.setMinHeight(760);
         stage.setScene(scene);
         stage.show();
     }
