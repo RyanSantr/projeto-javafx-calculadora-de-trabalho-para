@@ -10,10 +10,6 @@ A interface usa uma estetica retro desktop, com fundo animado, paineis responsiv
 
 ![Tela principal](screenshots/tela-principal.png)
 
-### Visao com os tres estados
-
-![Prints juntos](screenshots/prints-juntos.png)
-
 ## Formula usada
 
 ```text
