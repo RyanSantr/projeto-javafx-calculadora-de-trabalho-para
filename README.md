@@ -10,14 +10,6 @@ A interface usa uma estetica retro desktop, com fundo animado, paineis responsiv
 
 ![Tela principal](screenshots/tela-principal.png)
 
-### Clique no sprite/personagem
-
-![Clique no sprite/personagem](screenshots/sprite-personagem.png)
-
-### Clique no icone Resultado
-
-![Clique no icone Resultado](screenshots/icone-resultado.png)
-
 ### Visao com os tres estados
 
 ![Prints juntos](screenshots/prints-juntos.png)
