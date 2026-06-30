@@ -6,6 +6,25 @@ $packageInput = Join-Path $root "out\package"
 $jarPath = Join-Path $packageInput "calculadora-trabalho-eletrico.jar"
 $dist = Join-Path $root "dist"
 $javaFxLib = Join-Path $root "lib\javafx-sdk-21.0.4\lib"
+$localWixTools = Join-Path $root "tools\wix-3.14.1\tools"
+
+if (-not (Test-Path (Join-Path $localWixTools "candle.exe"))) {
+    $toolsDir = Join-Path $root "tools"
+    $wixPackage = Join-Path $toolsDir "wix.3.14.1.nupkg"
+    $wixZip = Join-Path $toolsDir "wix.3.14.1.zip"
+    $wixExtractDir = Join-Path $toolsDir "wix-3.14.1"
+
+    New-Item -ItemType Directory -Force -Path $toolsDir | Out-Null
+    if (-not (Test-Path $wixPackage)) {
+        Write-Host "Baixando WiX Toolset portatil 3.14.1..."
+        curl.exe -L "https://www.nuget.org/api/v2/package/wix/3.14.1" -o $wixPackage
+    }
+
+    Copy-Item -LiteralPath $wixPackage -Destination $wixZip -Force
+    Expand-Archive -LiteralPath $wixZip -DestinationPath $wixExtractDir -Force
+}
+
+$env:PATH = "$localWixTools;$env:PATH"
 
 function Invoke-Checked {
     param(
@@ -50,6 +69,7 @@ Invoke-Checked "jpackage" @(
     "--main-class", "br.com.ryan.trabalhoeletrico.Main",
     "--module-path", $javaFxLib,
     "--add-modules", "javafx.controls",
+    "--java-options", "-Dprism.order=sw",
     "--dest", $dist
 )
 

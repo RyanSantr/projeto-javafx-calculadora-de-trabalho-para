@@ -108,7 +108,10 @@ Saida esperada:
 ```text
 dist/CalculadoraTrabalhoEletrico/CalculadoraTrabalhoEletrico.exe
 dist/CalculadoraTrabalhoEletrico-windows.zip
+dist/CalculadoraTrabalhoEletrico-1.0.0.exe
 ```
+
+Use `CalculadoraTrabalhoEletrico-1.0.0.exe` quando quiser um instalador Windows. Use o ZIP quando quiser uma versao portatil sem instalar.
 
 ## Como gerar app Linux
 
@@ -116,4 +119,16 @@ Em Linux com JDK 21:
 
 ```bash
 bash package-linux.sh
+```
+
+Saida esperada:
+
+```text
+dist-linux/CalculadoraTrabalhoEletrico-linux.tar.gz
+```
+
+Depois de extrair:
+
+```bash
+./CalculadoraTrabalhoEletrico/Abrir\ CalculadoraTrabalhoEletrico.sh
 ```

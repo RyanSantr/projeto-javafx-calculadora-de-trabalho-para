@@ -2,9 +2,12 @@ package br.com.ryan.trabalhoeletrico;
 
 import javafx.application.Application;
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 import javafx.animation.SequentialTransition;
+import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ChangeListener;
@@ -44,6 +47,10 @@ import java.util.Locale;
 
 public class Main extends Application {
 
+    static {
+        System.setProperty("prism.order", System.getProperty("prism.order", "sw"));
+    }
+
     private static final double DESIGN_W = 1400;
     private static final double DESIGN_H = 1000;
     private static final double K = 8.99e9;
@@ -60,11 +67,22 @@ public class Main extends Application {
     private Pane inputPanel;
     private Pane diagramWindow;
     private Pane calculationsPanel;
+    private Pane calculationAnimationLayer;
+    private Rectangle calculationScanLine;
+    private Label calculationAnimationLabel;
+    private Timeline calculationAnimation;
     private Node resultBox;
 
-    private final DecimalFormat inputFormat = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(new Locale("pt", "BR")));
-    private final DecimalFormat factorFormat = new DecimalFormat("0.0000000", DecimalFormatSymbols.getInstance(new Locale("pt", "BR")));
+    private final DecimalFormat inputFormat = new DecimalFormat("0.00", commaSymbols());
+    private final DecimalFormat factorFormat = new DecimalFormat("0.0000000", commaSymbols());
     private final DecimalFormat scientificFormat = new DecimalFormat("0.00E0", DecimalFormatSymbols.getInstance(Locale.US));
+
+    private static DecimalFormatSymbols commaSymbols() {
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.US);
+        symbols.setDecimalSeparator(',');
+        symbols.setGroupingSeparator('.');
+        return symbols;
+    }
 
     @Override
     public void start(Stage stage) {
@@ -111,6 +129,8 @@ public class Main extends Application {
         desktop.getChildren().add(new AnimatedRetroBackground(DESIGN_W, DESIGN_H));
         desktop.getChildren().add(createTopBar());
 
+        addCharacter(desktop);
+
         inputPanel = createInputPanel();
         inputPanel.setLayoutX(38);
         inputPanel.setLayoutY(105);
@@ -126,7 +146,6 @@ public class Main extends Application {
         calculationsPanel.setLayoutY(635);
         desktop.getChildren().add(calculationsPanel);
 
-        addCharacter(desktop);
         addRightIcons(desktop);
 
         calculate();
@@ -224,7 +243,9 @@ public class Main extends Application {
         statusDot.setLayoutX(43);
         statusDot.setLayoutY(573);
 
-        statusLabel = label("Pronto para calcular", 70, 560, 16, false);
+        statusLabel = label("Pronto para calcular", 70, 555, 14, false);
+        statusLabel.setPrefWidth(205);
+        statusLabel.setWrapText(true);
 
         panel.setPrefSize(310, 610);
         panel.getChildren().addAll(calc, clear, statusDot, statusLabel);
@@ -336,6 +357,9 @@ public class Main extends Application {
         resultBoxPane.getChildren().add(resultLine);
         panel.getChildren().add(resultBoxPane);
 
+        addCatToCalculationsPanel(panel);
+        panel.getChildren().add(createCalculationAnimationLayer());
+
         return panel;
     }
 
@@ -344,17 +368,9 @@ public class Main extends Application {
         girl.setLayoutX(40);
         girl.setLayoutY(640);
         makeSpriteClickable(girl, "Personagem", () -> {
-            statusLabel.setText("Luna: física + código + eletricidade.");
+            statusLabel.setText("Luna iniciou os calculos.");
             pulse(girl);
-            focusNode(calculationsPanel, "Cálculos destacados pela personagem.");
-        });
-
-        ImageView cat = imageView("/assets/gato.png", 115, -1);
-        cat.setLayoutX(135);
-        cat.setLayoutY(624);
-        makeSpriteClickable(cat, "Gato ajudante", () -> {
-            statusLabel.setText("Gato: sistema simétrico detectado.");
-            pulse(cat);
+            animateCharacterCalculation();
         });
 
         ImageView sparkles = imageView("/assets/brilhos.png", 85, -1);
@@ -367,7 +383,44 @@ public class Main extends Application {
             focusNode(resultBox, "Resultado atualizado.");
         });
 
-        desktop.getChildren().addAll(sparkles, girl, cat);
+        desktop.getChildren().addAll(sparkles, girl);
+    }
+
+    private void addCatToCalculationsPanel(Pane panel) {
+        ImageView cat = imageView("/assets/gato.png", 62, -1);
+        cat.setLayoutX(742);
+        cat.setLayoutY(4);
+        makeSpriteClickable(cat, "Gato ajudante", () -> {
+            statusLabel.setText("Gato: sistema simetrico detectado.");
+            pulse(cat);
+            focusNode(calculationsPanel, "Painel de calculos destacado.");
+        });
+        panel.getChildren().add(cat);
+    }
+
+    private Pane createCalculationAnimationLayer() {
+        Pane layer = new Pane();
+        layer.setLayoutX(382);
+        layer.setLayoutY(103);
+        layer.setPrefSize(410, 225);
+        layer.setVisible(false);
+        layer.setMouseTransparent(true);
+        layer.getStyleClass().add("calculation-overlay");
+
+        calculationScanLine = new Rectangle(62, 225);
+        calculationScanLine.getStyleClass().add("calculation-scan");
+        calculationScanLine.setTranslateX(-72);
+
+        calculationAnimationLabel = new Label("Preparando calculo...");
+        calculationAnimationLabel.getStyleClass().add("calculation-overlay-label");
+        calculationAnimationLabel.setLayoutX(28);
+        calculationAnimationLabel.setLayoutY(92);
+        calculationAnimationLabel.setPrefSize(355, 40);
+        calculationAnimationLabel.setAlignment(Pos.CENTER);
+
+        layer.getChildren().addAll(calculationScanLine, calculationAnimationLabel);
+        calculationAnimationLayer = layer;
+        return layer;
     }
 
     private void addRightIcons(Pane desktop) {
@@ -417,6 +470,7 @@ public class Main extends Application {
 
     private void makeSpriteClickable(Node node, String tooltip, Runnable action) {
         node.setCursor(Cursor.HAND);
+        node.setPickOnBounds(true);
         Tooltip.install(node, new Tooltip(tooltip));
         node.setOnMouseClicked(e -> action.run());
         node.setOnMouseEntered(e -> {
@@ -427,6 +481,51 @@ public class Main extends Application {
             node.setScaleX(1.0);
             node.setScaleY(1.0);
         });
+    }
+
+    private void animateCharacterCalculation() {
+        if (calculationAnimationLayer == null || calculationScanLine == null || calculationAnimationLabel == null) {
+            calculate();
+            focusNode(calculationsPanel, "Calculo concluido.");
+            return;
+        }
+
+        if (calculationAnimation != null) {
+            calculationAnimation.stop();
+        }
+        calculationsPanel.toFront();
+        calculationAnimationLayer.toFront();
+        calculationAnimationLayer.setVisible(true);
+        calculationAnimationLayer.setOpacity(1.0);
+        calculationScanLine.setTranslateX(-72);
+        calculationAnimationLabel.setText("Luna esta preparando o calculo...");
+        statusLabel.setText("Luna esta calculando...");
+
+        calculationAnimation = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(calculationScanLine.translateXProperty(), -72),
+                        new KeyValue(calculationAnimationLayer.opacityProperty(), 1.0)
+                ),
+                new KeyFrame(Duration.millis(650), e ->
+                        calculationAnimationLabel.setText("Convertendo pC para C e cm para m...")),
+                new KeyFrame(Duration.millis(1350), e ->
+                        calculationAnimationLabel.setText("Substituindo os valores na formula...")),
+                new KeyFrame(Duration.millis(2150), e ->
+                        calculationAnimationLabel.setText("Aplicando o fator geometrico...")),
+                new KeyFrame(Duration.millis(2600),
+                        new KeyValue(calculationAnimationLayer.opacityProperty(), 1.0)
+                ),
+                new KeyFrame(Duration.millis(3000),
+                        new KeyValue(calculationScanLine.translateXProperty(), 430),
+                        new KeyValue(calculationAnimationLayer.opacityProperty(), 0.0)
+                )
+        );
+        calculationAnimation.setOnFinished(e -> {
+            calculationAnimationLayer.setVisible(false);
+            calculate();
+            focusNode(resultBox, "Calculo da Luna concluido.");
+        });
+        calculationAnimation.playFromStart();
     }
 
     private void focusNode(Node node, String message) {
@@ -660,7 +759,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        System.setProperty("prism.order", System.getProperty("prism.order", "sw"));
         launch(args);
     }
 

@@ -57,6 +57,7 @@ jpackage \
     --main-class br.com.ryan.trabalhoeletrico.Main \
     --module-path "$JAVAFX_LIB" \
     --add-modules javafx.controls \
+    --java-options "-Dprism.order=sw" \
     --dest "$DIST"
 
 for native_target in "$APP_FOLDER/lib/runtime/lib" "$APP_FOLDER/runtime/lib"; do
