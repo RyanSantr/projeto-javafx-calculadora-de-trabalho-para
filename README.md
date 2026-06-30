@@ -20,9 +20,6 @@ O pacote ja inclui JavaFX e runtime no `dist`, entao nao precisa baixar dependen
 
 ## Melhorias visuais e interativas
 
-- sprite novo da personagem Luna em perfil, maior e preservado acima dos cards;
-- fundo animado refeito com ondas continuas por seno, sem quebras no loop;
-- relogio da barra superior agora usa o horario real do computador;
 - efeito sonoro curto ao clicar em `Calcular`;
 - botao `Limpar` limpa campos, conversoes, substituicao e resultado.
 
