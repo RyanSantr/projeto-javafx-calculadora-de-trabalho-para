@@ -2,6 +2,7 @@ package br.com.ryan.trabalhoeletrico;
 
 import javafx.application.Application;
 import javafx.animation.AnimationTimer;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.PauseTransition;
@@ -24,6 +25,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.media.AudioClip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -41,6 +43,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.InputStream;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -54,6 +58,8 @@ public class Main extends Application {
     private static final double DESIGN_W = 1400;
     private static final double DESIGN_H = 1000;
     private static final double K = 8.99e9;
+    private static final DateTimeFormatter CLOCK_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final double WAVE_PERIOD = 700;
 
     private TextField qField;
     private TextField aField;
@@ -63,6 +69,7 @@ public class Main extends Application {
     private Label substitutionLine1;
     private Label substitutionLine2;
     private Label resultLabel;
+    private Label clockLabel;
 
     private Pane inputPanel;
     private Pane diagramWindow;
@@ -72,6 +79,8 @@ public class Main extends Application {
     private Label calculationAnimationLabel;
     private Timeline calculationAnimation;
     private Node resultBox;
+    private Pane characterLayer;
+    private AudioClip calculateSound;
 
     private final DecimalFormat inputFormat = new DecimalFormat("0.00", commaSymbols());
     private final DecimalFormat factorFormat = new DecimalFormat("0.0000000", commaSymbols());
@@ -111,6 +120,7 @@ public class Main extends Application {
 
         Scene scene = new Scene(root, 1366, 900);
         scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+        calculateSound = loadSound("/audio/calculate.wav");
 
         stage.setTitle("Calculadora de Trabalho Elétrico");
         stage.setMinWidth(760);
@@ -176,13 +186,15 @@ public class Main extends Application {
         menu.setLayoutX(445);
         menu.setLayoutY(19);
 
-        Label icons = new Label("≋   🔊   11:28 AM   ▣");
-        icons.getStyleClass().add("retro-label");
-        icons.setFont(Font.font("Consolas", FontWeight.BOLD, 20));
-        icons.setLayoutX(1110);
-        icons.setLayoutY(15);
+        clockLabel = new Label();
+        clockLabel.getStyleClass().add("retro-label");
+        clockLabel.setFont(Font.font("Consolas", FontWeight.BOLD, 20));
+        clockLabel.setLayoutX(1088);
+        clockLabel.setLayoutY(15);
+        clockLabel.setPrefWidth(260);
+        startClock();
 
-        bar.getChildren().addAll(appIcon, title, menu, icons);
+        bar.getChildren().addAll(appIcon, title, menu, clockLabel);
         return bar;
     }
 
@@ -227,7 +239,7 @@ public class Main extends Application {
         calc.setLayoutX(30);
         calc.setLayoutY(425);
         calc.setPrefSize(250, 55);
-        calc.setOnAction(e -> calculate());
+        calc.setOnAction(e -> handleCalculateClick());
 
         Button clear = new Button("⟳  Limpar");
         clear.getStyleClass().add("secondary-button");
@@ -300,7 +312,7 @@ public class Main extends Application {
         formulaBox.setLayoutX(28);
         formulaBox.setLayoutY(105);
         formulaBox.setPrefSize(285, 92);
-        Label formula = new Label("W = k q²  ((√2 + 2) / a)");
+        Label formula = new Label("W = (k q² / a)(√2 - 4)");
         formula.getStyleClass().add("retro-label");
         formula.setFont(Font.font("Georgia", FontWeight.BOLD, 27));
         formulaBox.getChildren().add(formula);
@@ -348,7 +360,7 @@ public class Main extends Application {
         Label bolt = new Label("⚡");
         bolt.setFont(Font.font("Consolas", FontWeight.BOLD, 28));
         bolt.setTextFill(Color.web("#159bc0"));
-        resultLabel = new Label("7,71 × 10⁻¹¹ J");
+        resultLabel = new Label("-1.920e-13 J");
         resultLabel.getStyleClass().add("result-number");
         Label star = new Label("☆");
         star.setFont(Font.font("Consolas", FontWeight.BOLD, 28));
@@ -363,26 +375,30 @@ public class Main extends Application {
     }
 
     private void addCharacter(Pane desktop) {
-        ImageView girl = imageView("/assets/garota.png", 175, -1);
-        girl.setLayoutX(225);
-        girl.setLayoutY(655);
-        makeSpriteClickable(girl, "Personagem", () -> {
+        characterLayer = new Pane();
+        characterLayer.setPickOnBounds(false);
+
+        ImageView girl = imageView("/assets/garota_perfil.png", 220, -1);
+        girl.setLayoutX(184);
+        girl.setLayoutY(538);
+        makeSpriteClickable(girl, "Luna", () -> {
             statusLabel.setText("Luna iniciou os calculos.");
             pulse(girl);
             animateCharacterCalculation();
         });
 
-        ImageView sparkles = imageView("/assets/brilhos.png", 85, -1);
-        sparkles.setLayoutX(205);
-        sparkles.setLayoutY(705);
+        ImageView sparkles = imageView("/assets/brilhos.png", 92, -1);
+        sparkles.setLayoutX(148);
+        sparkles.setLayoutY(662);
         makeSpriteClickable(sparkles, "Brilhos", () -> {
-            calculate();
+            handleCalculateClick();
             statusLabel.setText("Energia recalculada.");
             pulse(sparkles);
             focusNode(resultBox, "Resultado atualizado.");
         });
 
-        desktop.getChildren().addAll(sparkles, girl);
+        characterLayer.getChildren().addAll(sparkles, girl);
+        desktop.getChildren().add(characterLayer);
     }
 
     private void addCatToCalculationsPanel(Pane panel) {
@@ -493,6 +509,7 @@ public class Main extends Application {
             calculationAnimation.stop();
         }
         calculationsPanel.toFront();
+        keepForegroundVisible();
         calculationAnimationLayer.toFront();
         calculationAnimationLayer.setVisible(true);
         calculationAnimationLayer.setOpacity(1.0);
@@ -530,6 +547,7 @@ public class Main extends Application {
     private void focusNode(Node node, String message) {
         if (node == null) return;
         node.toFront();
+        keepForegroundVisible();
         node.setEffect(new DropShadow(30, Color.web("#12bfe8")));
 
         ScaleTransition grow = new ScaleTransition(Duration.millis(120), node);
@@ -548,6 +566,38 @@ public class Main extends Application {
 
         if (statusLabel != null && message != null) {
             statusLabel.setText(message);
+        }
+    }
+
+    private void handleCalculateClick() {
+        playCalculateSound();
+        calculate();
+    }
+
+    private AudioClip loadSound(String path) {
+        var resource = getClass().getResource(path);
+        return resource == null ? null : new AudioClip(resource.toExternalForm());
+    }
+
+    private void playCalculateSound() {
+        if (calculateSound != null) {
+            calculateSound.stop();
+            calculateSound.play(0.35);
+        }
+    }
+
+    private void startClock() {
+        Timeline clock = new Timeline(
+                new KeyFrame(Duration.ZERO, e -> clockLabel.setText("‹   ♪   " + LocalTime.now().format(CLOCK_FORMAT) + "   ▣")),
+                new KeyFrame(Duration.seconds(1))
+        );
+        clock.setCycleCount(Animation.INDEFINITE);
+        clock.play();
+    }
+
+    private void keepForegroundVisible() {
+        if (characterLayer != null) {
+            characterLayer.toFront();
         }
     }
 
@@ -662,49 +712,68 @@ public class Main extends Application {
 
     private void calculate() {
         try {
-            double qPc = parse(qField.getText());
-            double aCm = parse(aField.getText());
+            double qPc = parsePositive(qField.getText(), "A carga q");
+            double aCm = parsePositive(aField.getText(), "O lado a");
 
-            if (aCm == 0) {
-                throw new IllegalArgumentException("O lado a não pode ser zero.");
-            }
-
+            // Trabalho para montar o sistema: quatro lados negativos e duas diagonais positivas.
+            double k = 8.99e9;
             double qC = qPc * 1e-12;
-            double aM = aCm * 1e-2;
-            double geometricFactor = (Math.sqrt(2) + 2) / aM;
-            double work = K * Math.pow(qC, 2) * geometricFactor;
+            double aM = aCm / 100.0;
+            double trabalho = (k * qC * qC / aM) * (Math.sqrt(2) - 4);
+            double geometricFactor = Math.sqrt(2) - 4;
+
+            String resultado = String.format(Locale.US, "%.3e J", trabalho);
 
             qConversionLabel.setText("q = " + comma(qPc) + " pC = " + sciMantissa(qC) + " × 10" + superscriptExponent(qC) + " C");
             aConversionLabel.setText("a = " + comma(aCm) + " cm = " + sciMantissa(aM) + " × 10" + superscriptExponent(aM) + " m");
 
-            substitutionLine1.setText("W = (8,99 × 10⁹) (" + sciMantissa(qC) + " × 10" + superscriptExponent(qC) + ")² × ((√2 + 2) / (" + sciMantissa(aM) + " × 10" + superscriptExponent(aM) + "))");
-            substitutionLine2.setText("W = (8,99 × 10⁹) (" + sciMantissa(qC * qC) + " × 10" + superscriptExponent(qC * qC) + ") × " + factorFormat.format(geometricFactor));
+            substitutionLine1.setText("W = (k q² / a)(√2 - 4)");
+            substitutionLine2.setText("W = (8,99 × 10⁹ × (" + sciMantissa(qC) + " × 10" + superscriptExponent(qC) + ")² / (" + sciMantissa(aM) + " × 10" + superscriptExponent(aM) + ")) × " + factorFormat.format(geometricFactor));
 
-            resultLabel.setText(formatWork(work));
+            resultLabel.setText(resultado);
             statusLabel.setText("Tudo certo!");
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException ex) {
             statusLabel.setText("Verifique os valores");
             resultLabel.setText("Erro");
-            substitutionLine1.setText("Digite números válidos usando vírgula ou ponto.");
+            qConversionLabel.setText("q em pC precisa ser maior que zero.");
+            aConversionLabel.setText("a em cm precisa ser maior que zero.");
+            substitutionLine1.setText(ex.getMessage());
             substitutionLine2.setText("");
         }
     }
 
     private void clearFields() {
-        qField.setText("5,00");
-        aField.setText("10,00");
-        calculate();
+        qField.clear();
+        aField.clear();
+        qConversionLabel.setText("q = -- pC = -- C");
+        aConversionLabel.setText("a = -- cm = -- m");
+        substitutionLine1.setText("");
+        substitutionLine2.setText("");
+        resultLabel.setText("");
         statusLabel.setText("Pronto para calcular");
     }
 
-    private double parse(String text) {
+    private double parsePositive(String text, String fieldName) {
+        if (text == null || text.isBlank()) {
+            throw new IllegalArgumentException(fieldName + " é obrigatório.");
+        }
+
         String clean = text.trim().replace(" ", "");
         if (clean.contains(",") && clean.contains(".")) {
             clean = clean.replace(".", "").replace(',', '.');
         } else {
             clean = clean.replace(',', '.');
         }
-        return Double.parseDouble(clean);
+
+        try {
+            double value = Double.parseDouble(clean);
+            if (!Double.isFinite(value) || value <= 0) {
+                throw new IllegalArgumentException(fieldName + " deve ser maior que zero.");
+            }
+            return value;
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException(fieldName + " deve ser um número válido.");
+        }
     }
 
     private String comma(double value) {
@@ -793,8 +862,8 @@ public class Main extends Application {
                     double dt = (now - lastTime) / 1_000_000_000.0;
                     lastTime = now;
 
-                    waveShiftTop = wrapShift(waveShiftTop - (18 * dt));
-                    waveShiftBottom = wrapShift(waveShiftBottom + (10 * dt));
+                    waveShiftTop = wrapShift(waveShiftTop + (55 * dt));
+                    waveShiftBottom = wrapShift(waveShiftBottom - (32 * dt));
                     draw();
                 }
             };
@@ -802,11 +871,8 @@ public class Main extends Application {
         }
 
         private double wrapShift(double value) {
-            double wrapped = value % width;
-            if (wrapped > 0) {
-                wrapped -= width;
-            }
-            return wrapped;
+            double wrapped = value % WAVE_PERIOD;
+            return wrapped < 0 ? wrapped + WAVE_PERIOD : wrapped;
         }
 
         private void draw() {
@@ -816,13 +882,11 @@ public class Main extends Application {
             gc.setFill(Color.web("#f7eedc"));
             gc.fillRect(0, 0, width, height);
 
-            gc.setFill(Color.web("#aee6e7"));
-            repeatWave(gc, waveShiftTop, this::drawUpperWave);
+            drawWaveBand(gc, waveShiftTop, 185, 58, 0.0, Color.web("#aee6e7"));
+            drawWaveBand(gc, waveShiftBottom, 470, 82, Math.PI / 3, Color.web("#8fd6dc"));
+            drawWaveBand(gc, waveShiftTop * 0.72, 690, 54, Math.PI / 2, Color.web("#d8f2ef"));
 
-            gc.setFill(Color.web("#a4dfe2"));
-            repeatWave(gc, waveShiftBottom, this::drawLowerWave);
-
-            gc.setFill(Color.rgb(255, 255, 255, 0.28));
+            gc.setFill(Color.rgb(255, 255, 255, 0.20));
             gc.fillRect(0, 0, width, height);
 
             gc.setStroke(Color.web("#111111"));
@@ -830,43 +894,22 @@ public class Main extends Application {
             gc.strokeRoundRect(10, 10, width - 20, height - 20, 18, 18);
         }
 
-        private void repeatWave(GraphicsContext gc, double shift, WaveDrawer drawer) {
-            double start = shift - width;
-            for (double dx = start; dx <= width; dx += width) {
-                drawer.draw(gc, dx);
+        private void drawWaveBand(GraphicsContext gc, double shift, double baseY, double amplitude, double phaseOffset, Color color) {
+            gc.setFill(color);
+            gc.beginPath();
+            gc.moveTo(0, height);
+            gc.lineTo(0, waveY(0, shift, baseY, amplitude, phaseOffset));
+            for (double x = 0; x <= width; x += 8) {
+                gc.lineTo(x, waveY(x, shift, baseY, amplitude, phaseOffset));
             }
-        }
-
-        private void drawUpperWave(GraphicsContext gc, double dx) {
-            gc.beginPath();
-            gc.moveTo(dx + 0, 95);
-            gc.bezierCurveTo(dx + 185, 135, dx + 295, 230, dx + 478, 206);
-            gc.bezierCurveTo(dx + 640, 185, dx + 735, 75, dx + 900, 95);
-            gc.bezierCurveTo(dx + 1100, 120, dx + 1160, 260, dx + 1400, 345);
-            gc.lineTo(dx + 1400, 540);
-            gc.bezierCurveTo(dx + 1190, 495, dx + 1040, 408, dx + 860, 374);
-            gc.bezierCurveTo(dx + 705, 345, dx + 540, 430, dx + 330, 382);
-            gc.bezierCurveTo(dx + 170, 348, dx + 70, 275, dx + 0, 280);
+            gc.lineTo(width, height);
             gc.closePath();
             gc.fill();
         }
 
-        private void drawLowerWave(GraphicsContext gc, double dx) {
-            gc.beginPath();
-            gc.moveTo(dx + 0, 452);
-            gc.bezierCurveTo(dx + 210, 500, dx + 360, 470, dx + 560, 555);
-            gc.bezierCurveTo(dx + 785, 650, dx + 960, 770, dx + 1400, 775);
-            gc.lineTo(dx + 1400, 1000);
-            gc.lineTo(dx + 1040, 1000);
-            gc.bezierCurveTo(dx + 900, 805, dx + 725, 735, dx + 545, 672);
-            gc.bezierCurveTo(dx + 360, 606, dx + 185, 635, dx + 0, 598);
-            gc.closePath();
-            gc.fill();
-        }
-
-        @FunctionalInterface
-        private interface WaveDrawer {
-            void draw(GraphicsContext gc, double dx);
+        private double waveY(double x, double shift, double baseY, double amplitude, double phaseOffset) {
+            double phase = ((x + shift) / WAVE_PERIOD) * Math.PI * 2 + phaseOffset;
+            return baseY + Math.sin(phase) * amplitude + Math.sin(phase * 0.5) * amplitude * 0.35;
         }
     }
 

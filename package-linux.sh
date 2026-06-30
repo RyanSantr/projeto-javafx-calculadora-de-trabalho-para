@@ -56,7 +56,7 @@ jpackage \
     --main-jar "calculadora-trabalho-eletrico.jar" \
     --main-class br.com.ryan.trabalhoeletrico.Main \
     --module-path "$JAVAFX_LIB" \
-    --add-modules javafx.controls \
+    --add-modules javafx.controls,javafx.media \
     --java-options "-Dprism.order=sw" \
     --dest "$DIST"
 

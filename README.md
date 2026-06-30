@@ -1,134 +1,139 @@
 # Calculadora de Trabalho Eletrico - JavaFX Retro
 
-Aplicacao desktop em **Java 21 + JavaFX** para calcular o trabalho eletrico de um sistema de quatro cargas nos vertices de um quadrado.
+Aplicacao desktop em **Java 21 + JavaFX** para calcular o trabalho necessario para montar quatro cargas nos vertices de um quadrado.
 
-A interface usa uma estetica retro desktop, com fundo animado, paineis responsivos por escala proporcional, diagrama das cargas, resultado em notacao cientifica e sprites/atalhos clicaveis.
+## Como abrir
 
-## Prints
-
-### Tela principal
-
-![Tela principal](screenshots/tela-principal.png)
-
-## Formula usada
+Clique duas vezes em:
 
 ```text
-W = k q^2 ((sqrt(2) + 2) / a)
+Abrir CalculadoraTrabalhoEletrico.cmd
 ```
 
-Entradas:
-
-- `q` em picoCoulombs (`pC`);
-- `a` em centimetros (`cm`).
-
-Conversoes:
+Ou use o executavel portatil:
 
 ```text
-q(C) = q(pC) x 10^-12
-a(m) = a(cm) x 10^-2
-k = 8,99 x 10^9
+dist/CalculadoraTrabalhoEletrico/CalculadoraTrabalhoEletrico.exe
 ```
 
-Exemplo padrao:
+O pacote ja inclui JavaFX e runtime no `dist`, entao nao precisa baixar dependencias para executar.
+
+## Melhorias visuais e interativas
+
+- sprite novo da personagem Luna em perfil, maior e preservado acima dos cards;
+- fundo animado refeito com ondas continuas por seno, sem quebras no loop;
+- relogio da barra superior agora usa o horario real do computador;
+- efeito sonoro curto ao clicar em `Calcular`;
+- botao `Limpar` limpa campos, conversoes, substituicao e resultado.
+
+## Formula fisica usada
+
+O arranjo tem quatro cargas:
 
 ```text
-q = 5,00 pC
-a = 10,00 cm
-W = 7,67 x 10^-12 J
++q   -q
+-q   +q
 ```
 
-## Recursos
-
-- fundo retro animado em JavaFX `Canvas`;
-- layout responsivo por escala proporcional, sem cortar os paineis;
-- campos com entrada em virgula ou ponto;
-- validacao para valores invalidos;
-- diagrama das quatro cargas;
-- painel de formula, conversoes e substituicao;
-- sprites e icones clicaveis com hover, destaque e status;
-- fallback de renderizacao por software para evitar janela branca em alguns ambientes Windows.
-
-## Estrutura
+O trabalho necessario para montar o sistema a partir do infinito e igual a energia potencial eletrica total:
 
 ```text
-src/
-`-- main/
-    |-- java/
-    |   `-- br/com/ryan/trabalhoeletrico/Main.java
-    `-- resources/
-        |-- css/style.css
-        `-- assets/
-            |-- garota.png
-            |-- gato.png
-            |-- brilhos.png
-            |-- computador_retro.png
-            |-- caderno_diagrama.png
-            |-- calculadora_fofa.png
-            |-- documento_raio.png
-            `-- raio.png
-screenshots/
-|-- tela-principal.png
-|-- sprite-personagem.png
-|-- icone-resultado.png
-`-- prints-juntos.png
+W = U = soma k(qi qj) / rij
 ```
 
-## Como executar
+Pares considerados:
 
-No Windows PowerShell:
+- 4 lados do quadrado: cargas de sinais opostos, contribuicao negativa;
+- 2 diagonais: cargas de mesmo sinal, contribuicao positiva;
+- diagonal: `d = a * sqrt(2)`.
+
+Formula simplificada:
+
+```text
+W = (k * q^2 / a) * (sqrt(2) - 4)
+```
+
+Conversoes antes do calculo:
+
+```text
+qC = qPC * 1e-12
+aM = aCM / 100.0
+k = 8.99e9
+```
+
+Trecho central do codigo:
+
+```java
+double k = 8.99e9;
+double qC = qPc * 1e-12;
+double aM = aCm / 100.0;
+double trabalho = (k * qC * qC / aM) * (Math.sqrt(2) - 4);
+String resultado = String.format(Locale.US, "%.3e J", trabalho);
+```
+
+Exemplo:
+
+```text
+q = 2.30 pC
+a = 64.0 cm
+W ~= -1.921e-13 J
+```
+
+## Tratamento de entrada
+
+O metodo de validacao:
+
+- bloqueia campo vazio;
+- aceita virgula ou ponto decimal;
+- rejeita texto invalido;
+- rejeita `q <= 0`;
+- rejeita `a <= 0`;
+- converte sempre `q` para Coulomb e `a` para metro antes do calculo.
+
+## Desenvolvimento
+
+Executar em modo desenvolvimento:
 
 ```powershell
 .\run.ps1
 ```
 
-Ou, se o Maven estiver instalado:
-
-```powershell
-mvn javafx:run
-```
-
-## Como compilar
-
-No Windows PowerShell:
-
-```powershell
-.\build.ps1
-```
-
-O script baixa o JavaFX SDK se ele ainda nao existir em `lib/` e compila em `out/classes`.
-
-## Como gerar executavel Windows
+Gerar a versao portatil para Windows:
 
 ```powershell
 .\package.ps1
 ```
 
-Saida esperada:
+Saidas:
 
 ```text
 dist/CalculadoraTrabalhoEletrico/CalculadoraTrabalhoEletrico.exe
+dist/CalculadoraTrabalhoEletrico/Abrir CalculadoraTrabalhoEletrico.cmd
 dist/CalculadoraTrabalhoEletrico-windows.zip
-dist/CalculadoraTrabalhoEletrico-1.0.0.exe
 ```
 
-Use `CalculadoraTrabalhoEletrico-1.0.0.exe` quando quiser um instalador Windows. Use o ZIP quando quiser uma versao portatil sem instalar.
-
-## Como gerar app Linux
-
-Em Linux com JDK 21:
+Gerar a versao executavel para Linux em uma maquina Linux:
 
 ```bash
 bash package-linux.sh
 ```
 
-Saida esperada:
+Saida:
 
 ```text
 dist-linux/CalculadoraTrabalhoEletrico-linux.tar.gz
 ```
 
-Depois de extrair:
+Tambem existe uma workflow manual em `.github/workflows/build-linux-release.yml` para gerar o pacote Linux pelo GitHub Actions.
 
-```bash
-./CalculadoraTrabalhoEletrico/Abrir\ CalculadoraTrabalhoEletrico.sh
+Se estiver no Windows e quiser montar um pacote Linux portatil com Java e JavaFX incluidos, use:
+
+```powershell
+.\package-linux-portable.ps1
+```
+
+Saida:
+
+```text
+out-linux-portable/CalculadoraTrabalhoEletrico-linux-portable.tar.gz
 ```

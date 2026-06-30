@@ -8,6 +8,7 @@ dist/
 dist-linux/
 lib-linux/
 out-linux/
+out-linux-portable/
 tools/wix-*/
 tools/*.nupkg
 tools/*.zip
