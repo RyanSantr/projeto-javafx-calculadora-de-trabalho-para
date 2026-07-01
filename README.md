@@ -18,12 +18,6 @@ dist/CalculadoraTrabalhoEletrico/CalculadoraTrabalhoEletrico.exe
 
 O pacote ja inclui JavaFX e runtime no `dist`, entao nao precisa baixar dependencias para executar.
 
-## Prints da interface
-
-### Tela principal
-
-![Tela principal da calculadora](screenshots/tela-principal.png)
-
 ### Logica do calculo
 
 ![Print da logica de calculo](screenshots/print-logica-calculo.png)
@@ -104,6 +98,12 @@ O metodo de validacao:
 - rejeita `q <= 0`;
 - rejeita `a <= 0`;
 - converte sempre `q` para Coulomb e `a` para metro antes do calculo.
+
+  ## Prints da interface
+
+### Tela principal
+
+![Tela principal da calculadora](screenshots/tela-principal.png)
 
 ## Desenvolvimento
 
