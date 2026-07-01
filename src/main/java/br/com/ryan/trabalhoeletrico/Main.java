@@ -84,6 +84,9 @@ public class Main extends Application {
     private Pane characterLayer;
     private Pane electricSparkLayer;
     private Timeline characterSparkAnimation;
+    private ImageView characterView;
+    private Image[] lunaSilverFrames;
+    private Timeline lunaTransformationAnimation;
     private AudioClip calculateSound;
 
     private final DecimalFormat inputFormat = new DecimalFormat("0.00", commaSymbols());
@@ -385,21 +388,33 @@ public class Main extends Application {
         characterLayer.setLayoutY(708);
         characterLayer.setPrefSize(300, 290);
 
-        ImageView girl = imageView("/assets/garota.png", 222, -1);
-        girl.setViewport(new Rectangle2D(20, 0, 392, 505));
-        girl.setLayoutX(28);
-        girl.setLayoutY(0);
-        makeSpriteClickable(girl, "Luna", () -> {
-            statusLabel.setText("Luna soltou faiscas eletricas.");
-            pulse(girl);
+        lunaSilverFrames = loadLunaSilverFrames();
+        characterView = new ImageView(lunaSilverFrames[0]);
+        characterView.setPreserveRatio(true);
+        characterView.setFitWidth(250);
+        characterView.setViewport(new Rectangle2D(132, 0, 504, 555));
+        characterView.setLayoutX(14);
+        characterView.setLayoutY(2);
+        makeSpriteClickable(characterView, "Luna Silver Power", () -> {
+            statusLabel.setText("Luna ativou o Silver Power.");
+            pulse(characterView);
+            animateLunaTransformation();
             animateElectricSparks();
             handleCalculateClick();
         });
 
         electricSparkLayer = createElectricSparkLayer();
 
-        characterLayer.getChildren().addAll(girl, electricSparkLayer);
+        characterLayer.getChildren().addAll(characterView, electricSparkLayer);
         desktop.getChildren().add(characterLayer);
+    }
+
+    private Image[] loadLunaSilverFrames() {
+        return new Image[] {
+                loadImage("/assets/luna_silver_00_inicio.png"),
+                loadImage("/assets/luna_silver_01_meio.png"),
+                loadImage("/assets/luna_silver_02_fim.png")
+        };
     }
 
     private Pane createElectricSparkLayer() {
@@ -613,6 +628,26 @@ public class Main extends Application {
         characterSparkAnimation.playFromStart();
     }
 
+    private void animateLunaTransformation() {
+        if (characterView == null || lunaSilverFrames == null || lunaSilverFrames.length < 3) {
+            return;
+        }
+        if (lunaTransformationAnimation != null) {
+            lunaTransformationAnimation.stop();
+        }
+
+        characterView.setImage(lunaSilverFrames[0]);
+        lunaTransformationAnimation = new Timeline(
+                new KeyFrame(Duration.ZERO, e -> characterView.setImage(lunaSilverFrames[0])),
+                new KeyFrame(Duration.millis(220), e -> characterView.setImage(lunaSilverFrames[1])),
+                new KeyFrame(Duration.millis(460), e -> characterView.setImage(lunaSilverFrames[2])),
+                new KeyFrame(Duration.millis(760), e -> characterView.setImage(lunaSilverFrames[2])),
+                new KeyFrame(Duration.millis(980), e -> characterView.setImage(lunaSilverFrames[1])),
+                new KeyFrame(Duration.millis(1220), e -> characterView.setImage(lunaSilverFrames[0]))
+        );
+        lunaTransformationAnimation.playFromStart();
+    }
+
     private void animateCharacterCalculation() {
         if (calculationAnimationLayer == null || calculationScanLine == null || calculationAnimationLabel == null) {
             calculate();
@@ -823,6 +858,14 @@ public class Main extends Application {
         if (fitWidth > 0) view.setFitWidth(fitWidth);
         if (fitHeight > 0) view.setFitHeight(fitHeight);
         return view;
+    }
+
+    private Image loadImage(String path) {
+        InputStream stream = getClass().getResourceAsStream(path);
+        if (stream == null) {
+            throw new IllegalStateException("Asset nao encontrado: " + path);
+        }
+        return new Image(stream);
     }
 
     private void calculate() {
